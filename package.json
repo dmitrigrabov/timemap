@@ -5,12 +5,12 @@
   "homepage": ".",
   "private": true,
   "scripts": {
-    "start": "dev",
+    "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "tunnel": "ngrok http --region=eu --hostname=timemap.eu.ngrok.io 8080"
+    "tunnel": "ngrok http --region=eu --hostname=timemap.eu.ngrok.io 5173"
   },
   "dependencies": {
     "@datepicker-react/styled": "^2.8.4",
@@ -36,7 +36,7 @@
     "leaflet": "^1.0.3",
     "lint-staged": "^10.5.3",
     "marked": "^4.0.10",
-    "object-hash": "^1.3.0",
+    "object-hash": "3.0.0",
     "postcss-flexbugs-fixes": "4.2.1",
     "postcss-loader": "3.0.0",
     "postcss-normalize": "8.0.1",
@@ -62,14 +62,14 @@
     "semver": "7.3.2",
     "styled-components": "^5.3.5",
     "supercluster": "^7.1.5",
-    "video-react": "^0.13.1"
+    "video-react": "^0.16.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
     "eslint-visitor-keys": "^3.3.0",
     "prettier": "^2.6.2",
     "redux-devtools": "^3.4.0",
-    "sass": "^1.50.0",
+    "sass": "^1.62.1",
     "vite": "^4.3.3"
   },
   "lint-staged": {

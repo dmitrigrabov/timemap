@@ -1,15 +1,11 @@
 export const colors = {
-  fa_red: "#eb443e",
-  yellow: "#ffd800",
-  black: "#000",
-  white: "#fff",
-};
+  fa_red: '#eb443e',
+  yellow: '#ffd800',
+  black: '#000',
+  white: '#fff'
+}
 
-const exports = {
-  fallbackEventColor: colors.fa_red,
-  darkBackground: colors.black,
-  primaryHighlight: colors.fa_red,
-  secondaryHighlight: colors.white,
-};
-
-export default exports;
+export const fallbackEventColor = colors.fa_red
+export const darkBackground = colors.black
+export const primaryHighlight = colors.fa_red
+export const secondaryHighlight = colors.white

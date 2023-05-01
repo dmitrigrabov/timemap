@@ -7,5 +7,14 @@ export default defineConfig(() => {
       outDir: 'build',
     },
     plugins: [react()],
+    resolve: {
+      alias: [
+        {
+          // this is required for the SCSS modules
+          find: /^~(.*)$/,
+          replacement: '$1',
+        }
+      ]
+    }
   };
 });

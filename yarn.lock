@@ -5496,10 +5496,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"object-hash@npm:^1.3.0":
-  version: 1.3.1
-  resolution: "object-hash@npm:1.3.1"
-  checksum: fdcb957a2f15a9060e30655a9f683ba1fc25dfb8809a73d32e9634bec385a2f1d686c707ac1e5f69fb773bc12df03fb64c77ce3faeed83e35f4eb1946cb1989e
+"object-hash@npm:3.0.0":
+  version: 3.0.0
+  resolution: "object-hash@npm:3.0.0"
+  checksum: 80b4904bb3857c52cc1bfd0b52c0352532ca12ed3b8a6ff06a90cd209dfda1b95cee059a7625eb9da29537027f68ac4619363491eedb2f5d3dddbba97494fd6c
   languageName: node
   linkType: hard
 
@@ -7020,16 +7020,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.50.0":
-  version: 1.51.0
-  resolution: "sass@npm:1.51.0"
+"sass@npm:^1.62.1":
+  version: 1.62.1
+  resolution: "sass@npm:1.62.1"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: d674fd87be863961d5e5233a148e381a72b06ca1749ffd95a08be2c3f4aa8fc77e3e21840347a84d7d4542cbf97cd6f9bfae19ecb1f5eefa6c207a3d8f923dbc
+  checksum: 1b1b3584b38a63dd94156b65f13b90e3f84b170a38c3d5e3fa578b7a32a37aeb349b4926b0eaf9448d48e955e86b1ee01b13993f19611dad8068af07a607c13b
   languageName: node
   linkType: hard
 
@@ -7657,7 +7657,7 @@ __metadata:
     leaflet: ^1.0.3
     lint-staged: ^10.5.3
     marked: ^4.0.10
-    object-hash: ^1.3.0
+    object-hash: 3.0.0
     postcss-flexbugs-fixes: 4.2.1
     postcss-loader: 3.0.0
     postcss-normalize: 8.0.1
@@ -7681,12 +7681,12 @@ __metadata:
     redux-devtools: ^3.4.0
     redux-thunk: 2.4.1
     reselect: ^3.0.1
-    sass: ^1.50.0
+    sass: ^1.62.1
     screenfull: ^5.2.0
     semver: 7.3.2
     styled-components: ^5.3.5
     supercluster: ^7.1.5
-    video-react: ^0.13.1
+    video-react: ^0.16.0
     vite: ^4.3.3
   languageName: unknown
   linkType: soft
@@ -7931,9 +7931,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"video-react@npm:^0.13.1":
-  version: 0.13.9
-  resolution: "video-react@npm:0.13.9"
+"video-react@npm:^0.16.0":
+  version: 0.16.0
+  resolution: "video-react@npm:0.16.0"
   dependencies:
     "@babel/runtime": ^7.4.5
     classnames: ^2.2.6
@@ -7941,9 +7941,9 @@ __metadata:
     prop-types: ^15.7.2
     redux: ^4.0.1
   peerDependencies:
-    react: ^15.0.0 || ^16.0.0
-    react-dom: ^15.0.0 || ^16.0.0
-  checksum: d4ae9d171741d77aa878114aa2db865493f7384d269c5c1c4bdb8b4a1797a1038c1a60c4ad8458755e3bf7af10392086c9d69918bb045fdcdcc40dc5afcd74a7
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: f41d0255443fe16f8a73ee2075b1fae21432ae1d2952f14c01f1bfd42d6730e4e5cd96c870665892b5e82f51692d512867e58945f9fca1791a08ae3cb5bd7678
   languageName: node
   linkType: hard
 

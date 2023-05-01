@@ -1,6 +1,5 @@
-import { mergeDeepLeft } from 'ramda'
-
-import global, { colors } from '../common/global'
+import mergeDeepLeft from 'ramda/src/mergeDeepLeft'
+import { colors, fallbackEventColor } from '../common/global'
 import copy from '../common/data/copy.json'
 import { language } from '../common/utilities'
 import { DEFAULT_TAB_ICONS } from '../common/constants'
@@ -153,12 +152,12 @@ const initial = {
     },
     style: {
       categories: {
-        default: global.fallbackEventColor
+        default: fallbackEventColor
       },
       narratives: {
         default: {
           opacity: 0.9,
-          stroke: global.fallbackEventColor,
+          stroke: fallbackEventColor,
           strokeWidth: 3
         }
       },
@@ -201,9 +200,10 @@ const initial = {
   }
 }
 
+console.log('thing', import.meta.env.VITE_STORE)
 let appStore
-if (process.env.store) {
-  appStore = mergeDeepLeft(process.env.store, initial)
+if (import.meta.env.VITE_STORE) {
+  appStore = mergeDeepLeft(import.meta.env.VITE_STORE, initial)
 } else {
   appStore = initial
 }
