@@ -3,11 +3,12 @@ import dayjs from "dayjs";
 import hash from "object-hash";
 import { timeFormatDefaultLocale } from "d3";
 import { ASSOCIATION_MODES, POLYGON_CLIP_PATH } from "common/constants";
+import { dateFormat, timeFormat } from "config";
 
 dayjs.extend(customParseFormat);
 
-const DATE_FMT = import.meta.env.VITE_DATE_FMT ?? "MM/DD/YYYY";
-const TIME_FMT = import.meta.env.VITE_TIME_FMT ?? "HH:mm";
+const DATE_FMT = dateFormat ?? "MM/DD/YYYY";
+const TIME_FMT = timeFormat ?? "HH:mm";
 
 export const language = /* process.env.store.app.language || */ "en-US";
 
@@ -56,7 +57,7 @@ export function zipColorsToPercentages(colors, percentages) {
  */
 export function getParameterByName(name, url) {
   if (!url) {
-    url = window.location.href;
+    url = globalThis.window.location.href;
   }
   name = name.replace(/[[\]]/g, "\\$&");
 
@@ -98,8 +99,8 @@ export function isNotNullNorUndefined(variable) {
 /*
  * Taken from: https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
  */
-export function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+export function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export function trimAndEllipse(string, stringNum) {

@@ -87,15 +87,18 @@ export function validateDomain(domain, features) {
 
   function validateArray(items, domainKey, schema) {
     items.forEach((item) => {
-      if (domainKey === "events" && item.date === "" && item.time === "")
+      if (domainKey === "events" && item.date === "" && item.time === "") {
         return;
+      }
       validateArrayItem(item, domainKey, schema);
     });
   }
 
   function validateObject(obj, domainKey, itemSchema) {
     Object.keys(obj).forEach((key) => {
-      if (key === "") return;
+      if (key === "") {
+        return;
+      }
       const vl = obj[key];
       const result = Joi.validate(vl, itemSchema);
       if (result.error !== null) {
@@ -166,7 +169,9 @@ export function validateDomain(domain, features) {
       const foundAssociation = sanitizedDomain.associations.find(
         (elem) => elem.id === id
       );
-      if (foundAssociation) acc.push(foundAssociation);
+      if (foundAssociation) {
+        acc.push(foundAssociation);
+      }
       return acc;
     }, []);
 
@@ -174,10 +179,10 @@ export function validateDomain(domain, features) {
       const relatedShapeObj = sanitizedDomain.shapes.find(
         (elem) => elem.id === event.shape
       );
-      if (!relatedShapeObj)
+      if (!relatedShapeObj) {
         errorMsg =
           "Failed to find related shape. Please verify shape type for event.";
-      else {
+      } else {
         event.shape = relatedShapeObj;
       }
     }
@@ -186,9 +191,10 @@ export function validateDomain(domain, features) {
     event.longitude = event.longitude.replace(",", ".");
 
     event.datetime = calcDatetime(event.date, event.time);
-    if (!isValidDate(event.datetime))
+    if (!isValidDate(event.datetime)) {
       errorMsg =
         "Invalid date. It's been dropped, as otherwise timemap won't work as expected.";
+    }
 
     if (errorMsg) {
       discardedDomain.events.push({

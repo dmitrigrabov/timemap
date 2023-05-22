@@ -1,4 +1,4 @@
-import { urlFromEnv } from "../common/utilities";
+import { urlFromEnv } from "common/utilities";
 
 // TODO: relegate these URLs entirely to environment variables
 // const CONFIG_URL = urlFromEnv('CONFIG_EXT')

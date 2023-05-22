@@ -1,16 +1,17 @@
-import initial from "../store/initial.js";
+import initial from "store/initial";
 
-import { UPDATE_DOMAIN, MARK_NOTIFICATIONS_READ } from "../actions";
-import { validateDomain } from "./validate/validators.js";
+import { UPDATE_DOMAIN, MARK_NOTIFICATIONS_READ } from "actions";
+import { validateDomain } from "reducers/validate/validators";
+import { Domain } from "store/types";
 
-function updateDomain(domainState, action) {
+function updateDomain(domainState: Domain, action) {
   return {
     ...domainState,
     ...validateDomain(action.payload.domain, action.payload.features),
   };
 }
 
-function markNotificationsRead(domainState, action) {
+function markNotificationsRead(domainState: Domain, action) {
   return {
     ...domainState,
     notifications: domainState.notifications.map((n) => ({

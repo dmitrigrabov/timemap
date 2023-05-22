@@ -30,14 +30,15 @@ import {
   SET_INITIAL_SHAPES,
   UPDATE_SEARCH_QUERY,
 } from "actions";
+import { App } from "store/types";
 
-function updateHighlighted(appState, action) {
+function updateHighlighted(appState: App, action) {
   return Object.assign({}, appState, {
     highlighted: action.highlighted,
   });
 }
 
-function updateTicks(appState, action) {
+function updateTicks(appState: App, action) {
   return {
     ...appState,
     timeline: {

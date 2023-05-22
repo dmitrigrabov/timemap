@@ -1,9 +1,9 @@
 import { combineReducers } from "redux";
 
-import domain from "./domain.js";
-import app from "./app.js";
-import ui from "./ui.js";
-import features from "./features.js";
+import domain from "reducers/domain";
+import app from "reducers/app";
+import ui from "reducers/ui";
+import features from "reducers/features";
 
 export default combineReducers({
   app,
