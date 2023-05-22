@@ -6,9 +6,9 @@ import {
   isLatitude,
   isLongitude,
   createFilterPathString,
-} from "../common/utilities";
-import { isTimeRangedIn } from "./helpers";
-import { ASSOCIATION_MODES, SHAPE } from "../common/constants";
+} from "common/utilities";
+import { isTimeRangedIn } from "selectors/helpers";
+import { ASSOCIATION_MODES, SHAPE } from "common/constants";
 
 // Input selectors
 export const getEvents = (state) => state.domain.events;
@@ -54,7 +54,9 @@ export const selectSites = createSelector(
 export const selectSources = createSelector(
   [getSources, getFeatures],
   (sources, features) => {
-    if (features.USE_SOURCES) return sources;
+    if (features.USE_SOURCES) {
+      return sources;
+    }
     return {};
   }
 );
@@ -62,7 +64,9 @@ export const selectSources = createSelector(
 export const selectRegions = createSelector(
   [getRegions, getFeatures],
   (regions, features) => {
-    if (features.USE_REGIONS) return regions;
+    if (features.USE_REGIONS) {
+      return regions;
+    }
     return [];
   }
 );
@@ -200,7 +204,9 @@ export const selectNarrativeIdx = createSelector(
   [getSelected, getActiveNarrative],
   (selected, narrative) => {
     // Only one event selected in narrative mode
-    if (narrative === null) return -1;
+    if (narrative === null) {
+      return -1;
+    }
 
     const selectedEvent = selected[0];
     let selectedIdx;
@@ -235,7 +241,9 @@ export const selectLocations = createSelector([selectEvents], (events) => {
   const activeLocations = {};
   events.forEach((event) => {
     const { latitude, longitude } = event;
-    if (!isLatitude(latitude) || !isLongitude(longitude)) return;
+    if (!isLatitude(latitude) || !isLongitude(longitude)) {
+      return;
+    }
 
     const location = `${event.location}$_${event.latitude}_${event.longitude}`;
 
@@ -315,7 +323,9 @@ export const selectEventsWithProjects = createSelector(
       });
       let i = 0;
       // find the first empty slot
-      while (activeProjs[i]) i++;
+      while (activeProjs[i]) {
+        i++;
+      }
       // put proj in slot
       activeProjs[i] = proj.key;
 

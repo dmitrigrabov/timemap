@@ -1,55 +1,56 @@
-import React from 'react'
-import CardText from './atoms/Text'
-import CardButton from './atoms/Button'
-import CardCustom from './atoms/CustomField'
-import CardMedia from './atoms/Media'
-import { makeNiceDate, isEmptyString } from '../../common/utilities'
-import CardTime from './atoms/Time'
+import CardText from "components/atoms/Text";
+import CardButton from "components/atoms/Button";
+import CardCustom from "components/atoms/CustomField";
+import CardMedia from "components/atoms/Media";
+import { makeNiceDate, isEmptyString } from "common/utilities";
+import CardTime from "components/atoms/Time";
 
 export const CardField = ({ field, language }) => {
   switch (field.kind) {
-    case 'media':
+    case "media":
       return (
         <>
           {field.value.map((media, idx) => (
             <CardMedia key={idx} media={media} />
           ))}
         </>
-      )
-    case 'line':
+      );
+    case "line":
       return (
         <div style={{ height: `1rem`, width: `100%` }}>
           <hr />
         </div>
-      )
-    case 'line-break':
-      return <div style={{ height: `${field.times || 1}rem`, width: `100%` }} />
-    case 'item':
+      );
+    case "line-break":
+      return (
+        <div style={{ height: `${field.times || 1}rem`, width: `100%` }} />
+      );
+    case "item":
       // this is like a span
-      return null
-    case 'markdown':
-      return <CardCustom {...field} />
-    case 'tag':
+      return null;
+    case "markdown":
+      return <CardCustom {...field} />;
+    case "tag":
       return (
         <div
           className="card-cell m0"
           style={{
             textTransform: `uppercase`,
             fontSize: `.8em`,
-            lineHeight: `.8em`
+            lineHeight: `.8em`,
           }}
         >
           <div
             style={{
-              display: 'flex',
-              justifyContent: `flex-${field.align || `start`}`
+              display: "flex",
+              justifyContent: `flex-${field.align || `start`}`,
             }}
           >
             {field.value}
           </div>
         </div>
-      )
-    case 'button':
+      );
+    case "button":
       return (
         <div className="card-cell">
           {field.title && <h4>{field.title}</h4>}
@@ -59,18 +60,18 @@ export const CardField = ({ field, language }) => {
           ))}
           {/* </div> */}
         </div>
-      )
-    case 'text':
-      return !isEmptyString(field.value) && <CardText {...field} />
-    case 'date':
+      );
+    case "text":
+      return !isEmptyString(field.value) && <CardText {...field} />;
+    case "date":
       return (
         <CardTime
           language={language}
           timelabel={makeNiceDate(field.value)}
           {...field}
         />
-      )
-    case 'links':
+      );
+    case "links":
       return (
         <div className="card-cell">
           {field.title && <h4>{field.title}</h4>}
@@ -82,12 +83,12 @@ export const CardField = ({ field, language }) => {
             ))}
           </div>
         </div>
-      )
-    case 'list':
+      );
+    case "list":
       // Only render if some of the list's strings are non-empty
       const shouldFieldRender =
         !!field.value.length &&
-        !!field.value.filter(s => !isEmptyString(s)).length
+        !!field.value.filter((s) => !isEmptyString(s)).length;
       return shouldFieldRender ? (
         // <div className="card-cell">
         <div>
@@ -98,8 +99,8 @@ export const CardField = ({ field, language }) => {
             ))}
           </div>
         </div>
-      ) : null
+      ) : null;
     default:
-      return null
+      return null;
   }
-}
+};

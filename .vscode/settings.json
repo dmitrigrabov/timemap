@@ -1,6 +1,16 @@
 {
-  "editor.formatOnSave": true,
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false
+  },
+  "eslint.format.enable": true,
+  "eslint.validate": ["typescript"],
+  "[json]": {
+    "editor.formatOnSave": true
+  },
+  "editor.tabCompletion": "on",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifierEnding": "minimal"
 }

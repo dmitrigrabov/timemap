@@ -1,78 +1,83 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { generateCardLayout, Card } from './Card'
+import { Component, createRef } from "react";
+import { connect } from "react-redux";
+import { generateCardLayout, Card } from "components/controls/Card";
 
-import * as selectors from '../../selectors'
-import { getFilterIdxFromColorSet } from '../../common/utilities'
-import copy from '../../common/data/copy.json'
-import hash from 'object-hash'
+import * as selectors from "selectors";
+import { getFilterIdxFromColorSet } from "common/utilities";
+import copy from "common/data/copy.json";
+import hash from "object-hash";
 
-class CardStack extends React.Component {
+class CardStack extends Component {
   constructor() {
-    super()
-    this.refs = {}
-    this.refCardStack = React.createRef()
-    this.refCardStackContent = React.createRef()
+    super();
+    this.refs = {};
+    this.refCardStack = createRef();
+    this.refCardStackContent = createRef();
   }
 
   componentDidUpdate() {
-    const isNarrative = !!this.props.narrative
+    const isNarrative = !!this.props.narrative;
 
     if (isNarrative) {
-      this.scrollToCard()
+      this.scrollToCard();
     }
   }
 
   scrollToCard() {
-    const duration = 500
-    const element = this.refCardStack.current
-    const cardScroll = this.refs[this.props.narrative.current].current.offsetTop
+    const duration = 500;
+    const element = this.refCardStack.current;
+    const cardScroll =
+      this.refs[this.props.narrative.current].current.offsetTop;
 
-    const start = element.scrollTop
-    const change = cardScroll - start
-    let currentTime = 0
-    const increment = 20
+    const start = element.scrollTop;
+    const change = cardScroll - start;
+    let currentTime = 0;
+    const increment = 20;
 
     // t = current time
     // b = start value
     // c = change in value
     // d = duration
     Math.easeInOutQuad = function (t, b, c, d) {
-      t /= d / 2
-      if (t < 1) return (c / 2) * t * t + b
-      t -= 1
-      return (-c / 2) * (t * (t - 2) - 1) + b
-    }
+      t /= d / 2;
+      if (t < 1) {
+        return (c / 2) * t * t + b;
+      }
+      t -= 1;
+      return (-c / 2) * (t * (t - 2) - 1) + b;
+    };
 
     const animateScroll = function () {
-      currentTime += increment
-      const val = Math.easeInOutQuad(currentTime, start, change, duration)
-      element.scrollTop = val
-      if (currentTime < duration) setTimeout(animateScroll, increment)
-    }
-    animateScroll()
+      currentTime += increment;
+      const val = Math.easeInOutQuad(currentTime, start, change, duration);
+      element.scrollTop = val;
+      if (currentTime < duration) {
+        setTimeout(animateScroll, increment);
+      }
+    };
+    animateScroll();
   }
 
   renderCards(events, selections) {
     // if no selections provided, select all
     if (!selections) {
-      selections = events.map(e => true)
+      selections = events.map((e) => true);
     }
-    this.refs = []
+    this.refs = [];
 
     const generateTemplate =
-      generateCardLayout[this.props.cardUI.layout.template]
+      generateCardLayout[this.props.cardUI.layout.template];
 
     return events.map((event, idx) => {
-      const thisRef = React.createRef()
-      this.refs[idx] = thisRef
+      const thisRef = React.createRef();
+      this.refs[idx] = thisRef;
 
       const content = generateTemplate({
         event,
         colors: this.props.colors,
         coloringSet: this.props.coloringSet,
-        getFilterIdxFromColorSet
-      })
+        getFilterIdxFromColorSet,
+      });
 
       return (
         <Card
@@ -82,30 +87,30 @@ class CardStack extends React.Component {
           isLoading={this.props.isLoading}
           isSelected={selections[idx]}
         />
-      )
-    })
+      );
+    });
   }
 
   renderSelectedCards() {
-    const { selected } = this.props
+    const { selected } = this.props;
 
     if (selected.length > 0) {
-      return this.renderCards(selected)
+      return this.renderCards(selected);
     }
-    return null
+    return null;
   }
 
   renderNarrativeCards() {
-    const { narrative } = this.props
-    const showing = narrative.steps
+    const { narrative } = this.props;
+    const showing = narrative.steps;
 
-    const selections = showing.map((_, idx) => idx === narrative.current)
+    const selections = showing.map((_, idx) => idx === narrative.current);
 
-    return this.renderCards(showing, selections)
+    return this.renderCards(showing, selections);
   }
 
   renderCardStackHeader() {
-    const headerLang = copy[this.props.language].cardstack.header
+    const headerLang = copy[this.props.language].cardstack.header;
 
     return (
       <div
@@ -120,7 +125,7 @@ class CardStack extends React.Component {
           {`${this.props.selected.length} ${headerLang}`}
         </p>
       </div>
-    )
+    );
   }
 
   renderCardStackContent() {
@@ -128,7 +133,7 @@ class CardStack extends React.Component {
       <div id="card-stack-content" className="card-stack-content">
         <ul>{this.renderSelectedCards()}</ul>
       </div>
-    )
+    );
   }
 
   renderNarrativeContent() {
@@ -140,37 +145,37 @@ class CardStack extends React.Component {
       >
         <ul>{this.renderNarrativeCards()}</ul>
       </div>
-    )
+    );
   }
 
   render() {
-    const { isCardstack, selected, narrative } = this.props
+    const { isCardstack, selected, narrative } = this.props;
     if (selected.length > 0) {
       if (!narrative) {
         return (
           <div
             id="card-stack"
-            className={`card-stack ${isCardstack ? '' : ' folded'}`}
+            className={`card-stack ${isCardstack ? "" : " folded"}`}
           >
             {this.renderCardStackHeader()}
             {this.renderCardStackContent()}
           </div>
-        )
+        );
       } else {
         return (
           <div
             id="card-stack"
             ref={this.refCardStack}
             className={`card-stack narrative-mode
-            ${isCardstack ? '' : ' folded'}`}
+            ${isCardstack ? "" : " folded"}`}
           >
             {this.renderNarrativeContent()}
           </div>
-        )
+        );
       }
     }
 
-    return <div />
+    return <div />;
   }
 }
 
@@ -185,8 +190,8 @@ function mapStateToProps(state) {
     cardUI: state.ui.card,
     colors: state.ui.coloring.colors,
     coloringSet: state.app.associations.coloringSet,
-    features: state.features
-  }
+    features: state.features,
+  };
 }
 
-export default connect(mapStateToProps)(CardStack)
+export default connect(mapStateToProps)(CardStack);

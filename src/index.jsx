@@ -1,11 +1,9 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import store from "./store";
-import App from "./components/App";
+import store from "store";
+import App from "components/App";
 
-const root = ReactDOM.createRoot(document.getElementById("explore-app"));
-root.render(
+createRoot(globalThis.window.document.getElementById("explore-app")).render(
   <Provider store={store}>
     <App />
   </Provider>

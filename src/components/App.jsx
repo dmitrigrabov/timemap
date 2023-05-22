@@ -1,12 +1,12 @@
-import '../scss/main.scss'
-import 'video-react/dist/video-react.css'
-import React from 'react'
-import Layout from './Layout'
+import "scss/main.scss";
+import "video-react/dist/video-react.css";
+import Layout from "components/Layout";
+import { Component } from "react";
 
-class App extends React.Component {
+class App extends Component {
   render() {
-    return <Layout />
+    return <Layout />;
   }
 }
 
-export default App
+export default App;

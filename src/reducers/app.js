@@ -1,7 +1,6 @@
-import initial from "../store/initial.js";
-import { ASSOCIATION_MODES } from "../common/constants";
-import { toggleFlagAC } from "../common/utilities";
-
+import initial from "store/initial";
+import { ASSOCIATION_MODES } from "common/constants";
+import { toggleFlagAC } from "common/utilities";
 import {
   UPDATE_HIGHLIGHTED,
   UPDATE_SELECTED,
@@ -30,7 +29,7 @@ import {
   SET_INITIAL_CATEGORIES,
   SET_INITIAL_SHAPES,
   UPDATE_SEARCH_QUERY,
-} from "../actions";
+} from "actions";
 
 function updateHighlighted(appState, action) {
   return Object.assign({}, appState, {
@@ -83,16 +82,26 @@ function updateNarrative(appState, action) {
     // Find max and mins coordinates of narrative events
     action.narrative.steps.forEach((step) => {
       const stepTime = step.datetime;
-      if (stepTime < minTime) minTime = stepTime;
-      if (stepTime > maxTime) maxTime = stepTime;
+      if (stepTime < minTime) {
+        minTime = stepTime;
+      }
+      if (stepTime > maxTime) {
+        maxTime = stepTime;
+      }
 
       if (!!step.longitude && !!step.latitude) {
-        if (+step.longitude < cornerBound0[1])
+        if (+step.longitude < cornerBound0[1]) {
           cornerBound0[1] = +step.longitude;
-        if (+step.longitude > cornerBound1[1])
+        }
+        if (+step.longitude > cornerBound1[1]) {
           cornerBound1[1] = +step.longitude;
-        if (+step.latitude < cornerBound0[0]) cornerBound0[0] = +step.latitude;
-        if (+step.latitude > cornerBound1[0]) cornerBound1[0] = +step.latitude;
+        }
+        if (+step.latitude < cornerBound0[0]) {
+          cornerBound0[0] = +step.latitude;
+        }
+        if (+step.latitude > cornerBound1[0]) {
+          cornerBound1[0] = +step.latitude;
+        }
       }
     });
     // Adjust bounds to center around first event, while keeping visible all others
@@ -105,14 +114,18 @@ function updateNarrative(appState, action) {
       const firstToLat0 = Math.abs(+first.latitude - cornerBound0[0]);
       const firstToLat1 = Math.abs(+first.latitude - cornerBound1[0]);
 
-      if (firstToLong0 > firstToLong1)
+      if (firstToLong0 > firstToLong1) {
         cornerBound1[1] = +first.longitude + firstToLong0;
-      if (firstToLong0 < firstToLong1)
+      }
+      if (firstToLong0 < firstToLong1) {
         cornerBound0[1] = +first.longitude - firstToLong1;
-      if (firstToLat0 > firstToLat1)
+      }
+      if (firstToLat0 > firstToLat1) {
         cornerBound1[0] = +first.latitude + firstToLat0;
-      if (firstToLat0 < firstToLat1)
+      }
+      if (firstToLat0 < firstToLat1) {
         cornerBound0[0] = +first.latitude - firstToLat1;
+      }
     }
 
     // Add some buffer on both sides of the time extent
@@ -170,7 +183,7 @@ function toggleAssociations(appState, action) {
 }
 
 function toggleShapes(appState, action) {
-  let newShapes = [...appState.shapes];
+  const newShapes = [...appState.shapes];
   if (newShapes.includes(action.shape)) {
     const idx = newShapes.indexOf(action.shape);
     newShapes.splice(idx, 1);
@@ -274,7 +287,9 @@ function setNotLoading(appState) {
 
 function setInitialCategories(appState, action) {
   const categories = action.values.reduce((acc, val) => {
-    if (val.mode === ASSOCIATION_MODES.CATEGORY) acc.push(val.title);
+    if (val.mode === ASSOCIATION_MODES.CATEGORY) {
+      acc.push(val.title);
+    }
     return acc;
   }, []);
 

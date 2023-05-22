@@ -1,14 +1,15 @@
-import React from 'react'
-import Card from './atoms/NarrativeCard'
-import Adjust from './atoms/NarrativeAdjust'
-import Close from './atoms/NarrativeClose'
+import Card from "components/atoms/NarrativeCard";
+import Adjust from "components/atoms/NarrativeAdjust";
+import Close from "components/atoms/NarrativeClose";
 
 const NarrativeControls = ({ narrative, methods }) => {
-  if (!narrative) return null
+  if (!narrative) {
+    return null;
+  }
 
-  const { current, steps } = narrative
-  const prevExists = current !== 0
-  const nextExists = current < steps.length - 1
+  const { current, steps } = narrative;
+  const prevExists = current !== 0;
+  const nextExists = current < steps.length - 1;
 
   return (
     <>
@@ -28,7 +29,7 @@ const NarrativeControls = ({ narrative, methods }) => {
         closeMsg="-- exit from narrative --"
       />
     </>
-  )
-}
+  );
+};
 
-export default NarrativeControls
+export default NarrativeControls;

@@ -1,55 +1,55 @@
-import React from 'react'
+import { Component } from "react";
 
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import * as actions from '../../actions'
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import * as actions from "actions";
 
-import SearchRow from './atoms/SearchRow.jsx'
+import SearchRow from "components/atoms/SearchRow";
 
-class Search extends React.Component {
+class Search extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
-      isFolded: true
-    }
-    this.onButtonClick = this.onButtonClick.bind(this)
-    this.updateSearchQuery = this.updateSearchQuery.bind(this)
+      isFolded: true,
+    };
+    this.onButtonClick = this.onButtonClick.bind(this);
+    this.updateSearchQuery = this.updateSearchQuery.bind(this);
   }
 
   onButtonClick() {
-    this.setState(prevState => {
-      return { isFolded: !prevState.isFolded }
-    })
+    this.setState((prevState) => {
+      return { isFolded: !prevState.isFolded };
+    });
   }
 
   updateSearchQuery(e) {
-    const queryString = e.target.value
-    this.props.actions.updateSearchQuery(queryString)
+    const queryString = e.target.value;
+    this.props.actions.updateSearchQuery(queryString);
   }
 
   render() {
-    let searchResults
+    let searchResults;
 
-    const searchAttributes = ['description', 'location', 'category', 'date']
+    const searchAttributes = ["description", "location", "category", "date"];
 
     if (!this.props.queryString) {
-      searchResults = []
+      searchResults = [];
     } else {
-      searchResults = this.props.events.filter(event =>
-        searchAttributes.some(attribute =>
+      searchResults = this.props.events.filter((event) =>
+        searchAttributes.some((attribute) =>
           event[attribute]
             .toLowerCase()
             .includes(this.props.queryString.toLowerCase())
         )
-      )
+      );
     }
 
     return (
       <div
         className={
-          'search-outer-container' +
-          (this.props.narrative ? ' narrative-mode ' : '')
+          "search-outer-container" +
+          (this.props.narrative ? " narrative-mode " : "")
         }
       >
         <div id="search-bar-icon-container" onClick={this.onButtonClick}>
@@ -57,7 +57,7 @@ class Search extends React.Component {
         </div>
         <div
           className={
-            'search-bar-overlay' + (this.state.isFolded ? ' folded' : '')
+            "search-bar-overlay" + (this.state.isFolded ? " folded" : "")
           }
         >
           <div className="search-input-container">
@@ -75,26 +75,26 @@ class Search extends React.Component {
             </i>
           </div>
           <div className="search-results">
-            {searchResults.map(result => {
+            {searchResults.map((result) => {
               return (
                 <SearchRow
                   onSearchRowClick={this.props.onSearchRowClick}
                   eventObj={result}
                   query={this.props.queryString}
                 />
-              )
+              );
             })}
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(actions, dispatch)
-  }
+    actions: bindActionCreators(actions, dispatch),
+  };
 }
 
-export default connect(state => state, mapDispatchToProps)(Search)
+export default connect((state) => state, mapDispatchToProps)(Search);

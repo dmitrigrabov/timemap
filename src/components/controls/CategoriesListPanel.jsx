@@ -1,7 +1,6 @@
-import React from 'react'
-import { marked } from 'marked'
-import PanelTree from './atoms/PanelTree'
-import { ASSOCIATION_MODES } from '../../common/constants'
+import { marked } from "marked";
+import PanelTree from "components/atoms/PanelTree";
+import { ASSOCIATION_MODES } from "common/constants";
 
 const CategoriesListPanel = ({
   categories,
@@ -9,14 +8,14 @@ const CategoriesListPanel = ({
   onCategoryFilter,
   language,
   title,
-  description
+  description,
 }) => {
   return (
     <div className="react-innertabpanel">
       <h2>{title}</h2>
       <p
         dangerouslySetInnerHTML={{
-          __html: marked(description)
+          __html: marked(description),
         }}
       />
       <PanelTree
@@ -26,7 +25,7 @@ const CategoriesListPanel = ({
         type={ASSOCIATION_MODES.CATEGORY}
       />
     </div>
-  )
-}
+  );
+};
 
-export default CategoriesListPanel
+export default CategoriesListPanel;

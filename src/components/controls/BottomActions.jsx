@@ -1,8 +1,6 @@
-import React from 'react'
-
-import SitesIcon from '../atoms/SitesIcon'
-import CoverIcon from '../atoms/CoverIcon'
-import InfoIcon from '../atoms/InfoIcon'
+import SitesIcon from "components/atoms/SitesIcon";
+import CoverIcon from "components/atoms/CoverIcon";
+import InfoIcon from "components/atoms/InfoIcon";
 
 function BottomActions(props) {
   function renderToggles() {
@@ -31,10 +29,10 @@ function BottomActions(props) {
         </div>
         ,
       </>
-    )
+    );
   }
 
-  return <div className="bottom-actions">{renderToggles()}</div>
+  return <div className="bottom-actions">{renderToggles()}</div>;
 }
 
-export default BottomActions
+export default BottomActions;

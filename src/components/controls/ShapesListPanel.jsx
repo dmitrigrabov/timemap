@@ -1,8 +1,7 @@
-import React from 'react'
-import { marked } from 'marked'
-import PanelTree from './atoms/PanelTree'
-import { mapStyleByShape } from '../../common/utilities'
-import { SHAPE } from '../../common/constants'
+import { marked } from "marked";
+import PanelTree from "components/atoms/PanelTree";
+import { mapStyleByShape } from "common/utilities";
+import { SHAPE } from "common/constants";
 
 const ShapesListPanel = ({
   shapes,
@@ -10,15 +9,15 @@ const ShapesListPanel = ({
   onShapeFilter,
   language,
   title,
-  description
+  description,
 }) => {
-  const styledShapes = mapStyleByShape(shapes, activeShapes)
+  const styledShapes = mapStyleByShape(shapes, activeShapes);
   return (
     <div className="react-innertabpanel">
       <h2>{title}</h2>
       <p
         dangerouslySetInnerHTML={{
-          __html: marked(description)
+          __html: marked(description),
         }}
       />
       <PanelTree
@@ -28,7 +27,7 @@ const ShapesListPanel = ({
         type={SHAPE}
       />
     </div>
-  )
-}
+  );
+};
 
-export default ShapesListPanel
+export default ShapesListPanel;
