@@ -162,7 +162,7 @@ export type DomainState = {
   categories: unknown[]
   associations: unknown[]
   sources: unknown
-  sites: unknown[]
+  sites: Source[]
   shapes: unknown[]
   regions: unknown[]
   notifications: unknown[]
