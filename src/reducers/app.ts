@@ -26,7 +26,7 @@ import {
   SET_INITIAL_SHAPES,
   UPDATE_SEARCH_QUERY,
   UpdateHighlightedAction,
-  ActionTypes,
+  ActionTypes, 
   UpdateTicksAction
 } from 'actions'
 import { AppState } from 'store/types'

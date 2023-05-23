@@ -107,8 +107,58 @@ export type AppState = {
   map?: Map
 }
 
+export type Association = {
+  id: string
+  title: string
+  desc: string
+  mode: string
+  filter_paths: unknown[]
+}
+
+export type Source = {
+  id: string
+  title: string
+  thumbnail: string
+  paths: unknown[]
+  type: string
+  affil_s: unknown[]
+  url: string
+  description: string
+  parent: string
+  author: string
+  date: string
+  notes: string
+}
+
+export type Event = {
+  id: string
+  description: string
+  date: string
+  time: string
+  time_precision: string
+  location: string
+  latitude: string
+  longitude: string
+
+  x: string
+  y: string
+  z: string
+
+  type: string
+  category: string
+  category_full: string
+  associations: Association[]
+  sources: Source[]
+  comments: string
+  time_display: string
+
+  narrative__stepStyles: unknown[]
+  shape: string
+  colour: string
+}
+
 export type DomainState = {
-  events: unknown[]
+  events: Event[]
   categories: unknown[]
   associations: unknown[]
   sources: unknown
