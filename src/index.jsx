@@ -1,13 +1,13 @@
-import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import store from "store";
-import App from "components/App";
+import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
+import store from 'store'
+import App from 'components/App'
 
-createRoot(globalThis.window.document.getElementById("explore-app")).render(
+createRoot(globalThis.window.document.getElementById('explore-app')).render(
   <Provider store={store}>
     <App />
   </Provider>
-);
+)
 
 // Expressions from https://exceptionshub.com/how-to-detect-safari-chrome-ie-firefox-and-opera-browser.html
 

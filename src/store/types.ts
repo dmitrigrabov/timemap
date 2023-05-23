@@ -88,7 +88,7 @@ export type Map = {
   startZoom: number
 }
 
-export type App = {
+export type AppState = {
   debug: boolean
   errors: Errors
   highlighted: unknown
@@ -104,10 +104,10 @@ export type App = {
   cover: Cover
   toolbar: Toolbar
   loading: boolean
-  map: Map
+  map?: Map
 }
 
-export type Domain = {
+export type DomainState = {
   events: unknown[]
   categories: unknown[]
   associations: unknown[]
@@ -161,7 +161,7 @@ export type Dom = {
   map: string
 }
 
-export type Ui = {
+export type UiState = {
   tiles: Titles
   style: Style
   card: Card
@@ -170,7 +170,7 @@ export type Ui = {
   eventRadius: number
 }
 
-export type Features = {
+export type FeaturesState = {
   USE_COVER: boolean
   USE_ASSOCIATIONS: boolean
   USE_SITES: boolean
@@ -178,11 +178,14 @@ export type Features = {
   USE_REGIONS: boolean
   GRAPH_NONLOCATED: boolean
   HIGHLIGHT_GROUPS: boolean
+  USE_SHAPES: boolean
 }
 
-export type AppState = {
-  domain: Domain
-  app: App
-  ui: Ui
-  features: Features
+export type StoreState = {
+  domain: DomainState
+  app: AppState
+  ui: UiState
+  features: FeaturesState
 }
+
+export type GetState = () => StoreState

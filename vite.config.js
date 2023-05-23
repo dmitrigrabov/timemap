@@ -22,6 +22,10 @@ export default defineConfig(() => {
           replacement: "/src/components"
         },
         {
+          find: "config",
+          replacement: "/src/config"
+        },
+        {
           find: "reducers",
           replacement: "/src/reducers"
         },

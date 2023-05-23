@@ -1,6 +1,6 @@
-import initial from "../store/initial.js";
+import initial from 'store/initial'
 
-import { TOGGLE_SATELLITE_VIEW } from "../actions";
+import { TOGGLE_SATELLITE_VIEW } from 'actions'
 
 function ui(uiState = initial.ui, action) {
   switch (action.type) {
@@ -10,14 +10,14 @@ function ui(uiState = initial.ui, action) {
         tiles: {
           ...uiState.tiles,
           current:
-            uiState.tiles.current === "satellite"
+            uiState.tiles.current === 'satellite'
               ? uiState.tiles.default
-              : "satellite",
-        },
-      };
+              : 'satellite'
+        }
+      }
     default:
-      return uiState;
+      return uiState
   }
 }
 
-export default ui;
+export default ui

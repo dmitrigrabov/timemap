@@ -1,7 +1,7 @@
-import initial from "store/initial";
+import initial from 'store/initial'
 
-function features(featureState = initial.features, action) {
-  return featureState;
+function features(featureState = initial.features) {
+  return featureState
 }
 
-export default features;
+export default features
