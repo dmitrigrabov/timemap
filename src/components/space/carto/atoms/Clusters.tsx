@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Portal } from 'react-portal'
 import {
   fallbackEventColor,
   darkBackground,
   primaryHighlight
-} from '../../../../common/global'
-import ColoredMarkers from '../../../atoms/ColoredMarkers'
+} from 'common/global'
+import ColoredMarkers from 'components/atoms/ColoredMarkers'
 import {
   calcClusterOpacity,
   calcClusterSize,
@@ -14,13 +14,13 @@ import {
   calculateColorPercentages,
   zipColorsToPercentages,
   calculateTotalClusterPoints
-} from '../../../../common/utilities'
+} from 'common/utilities'
 
 const DefsClusters = () => (
   <defs>
     <radialGradient id="clusterGradient">
-      <stop offset="10%" stop-color="red" />
-      <stop offset="90%" stop-color="transparent" />
+      <stop offset="10%" stopColor="red" />
+      <stop offset="90%" stopColor="transparent" />
     </radialGradient>
   </defs>
 )
@@ -63,7 +63,10 @@ function Cluster({
   const [longitude, latitude] = coordinates
   const { x, y } = projectPoint([latitude, longitude])
   const [hovered, setHovered] = useState(false)
-  if (!isLatitude(latitude) || !isLongitude(longitude)) return null
+
+  if (!isLatitude(latitude) || !isLongitude(longitude)) {
+    return null
+  }
 
   return (
     <svg>

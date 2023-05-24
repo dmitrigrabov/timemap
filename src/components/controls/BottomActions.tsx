@@ -1,8 +1,14 @@
-import SitesIcon from "components/atoms/SitesIcon";
-import CoverIcon from "components/atoms/CoverIcon";
-import InfoIcon from "components/atoms/InfoIcon";
+import SitesIcon from 'components/atoms/SitesIcon'
+import CoverIcon from 'components/atoms/CoverIcon'
+import InfoIcon from 'components/atoms/InfoIcon'
+import { FC } from 'react'
+import { FeaturesState } from 'store/types'
 
-function BottomActions(props) {
+type BottomActionsProps = {
+  features: FeaturesState
+}
+
+const BottomActions: FC<BottomActionsProps> = props => {
   function renderToggles() {
     return (
       <>
@@ -29,10 +35,10 @@ function BottomActions(props) {
         </div>
         ,
       </>
-    );
+    )
   }
 
-  return <div className="bottom-actions">{renderToggles()}</div>;
+  return <div className="bottom-actions">{renderToggles()}</div>
 }
 
-export default BottomActions;
+export default BottomActions

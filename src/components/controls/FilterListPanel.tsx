@@ -5,6 +5,8 @@ import {
   getFilterIdxFromColorSet,
   getPathLeaf
 } from 'common/utilities'
+import { FC } from 'react'
+import { FilterAssociation } from 'store/types'
 
 /** recursively get an array of node keys to toggle */
 function getFiltersToToggle(filter, activeFilters) {
@@ -23,7 +25,11 @@ function getFiltersToToggle(filter, activeFilters) {
   return childKeys
 }
 
-function FilterListPanel({
+type FilterListPanelProps = {
+  filters: FilterAssociation[]
+}
+
+const FilterListPanel: FC<FilterListPanelProps> = ({
   filters,
   activeFilters,
   onSelectFilter,
@@ -32,7 +38,7 @@ function FilterListPanel({
   filterColors,
   title,
   description
-}) {
+}) => {
   function createNodeComponent(filter, depth) {
     const [key, children] = filter
     const pathLeaf = getPathLeaf(key)

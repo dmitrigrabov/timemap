@@ -1,7 +1,18 @@
-import React from 'react'
+import { FC } from 'react'
 
-const CoverIcon = ({ isActive, isDisabled, onClickHandler }) => {
+type CoverIconProps = {
+  isActive: boolean
+  isDisabled: boolean
+  onClickHandler: () => void
+}
+
+const CoverIcon: FC<CoverIconProps> = ({
+  isActive,
+  isDisabled,
+  onClickHandler
+}) => {
   let classes = isActive ? 'action-button enabled' : 'action-button'
+
   if (isDisabled) {
     classes = 'action-button disabled'
   }

@@ -5,6 +5,9 @@
   "[typescript]": {
     "editor.formatOnSave": false
   },
+  "[typescriptreact]": {
+    "editor.formatOnSave": false
+  },
   "eslint.format.enable": true,
   "eslint.validate": ["typescript"],
   "[json]": {

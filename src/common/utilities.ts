@@ -4,6 +4,7 @@ import hash from 'object-hash'
 import { timeFormatDefaultLocale } from 'd3'
 import { POLYGON_CLIP_PATH } from 'common/constants'
 import { apiRoot, dateFormat, timeFormat } from 'config'
+import { AppState } from 'store/types'
 
 dayjs.extend(customParseFormat)
 
@@ -38,12 +39,15 @@ export function getCoordinatesForPercent(radius: number, percent: number) {
  *
  * Return value:
  * ex. {'#fff': 0.5, '#000': 0.5, ...} */
-export function zipColorsToPercentages(colors, percentages) {
+export function zipColorsToPercentages(
+  colors: string[],
+  percentages: number[]
+) {
   if (colors.length < percentages.length) {
     throw new Error('You must declare an appropriate number of filter colors')
   }
 
-  return percentages.reduce((map, percent, idx) => {
+  return percentages.reduce<Record<string, number>>((map, percent, idx) => {
     map[colors[idx]] = percent
     return map
   }, {})
@@ -79,7 +83,7 @@ export function getParameterByName(name: string, url: string) {
  * @param {array} arr1: array of numbers
  * @param {array} arr2: array of numbers
  */
-export function areEqual(arr1, arr2) {
+export function areEqual(arr1: number[], arr2: number[]) {
   return (
     arr1.length === arr2.length &&
     arr1.every((element, index) => {
@@ -293,8 +297,17 @@ export const urlFromEnv = (path: string | string[] | undefined) => {
   }
 }
 
-export function toggleFlagAC(flag) {
-  return appState => ({
+type Flags =
+  | 'isShowingSites'
+  | 'isIntropopup'
+  | 'isInfopopup'
+  | 'isCardstack'
+  | 'isCover'
+  | 'isFetchingSources'
+  | 'isFetchingDomain'
+
+export function toggleFlagAC(flag: Flags) {
+  return (appState: AppState) => ({
     ...appState,
     flags: {
       ...appState.flags,
@@ -360,7 +373,7 @@ export function isIdentical(obj1, obj2) {
   return hash(obj1) === hash(obj2)
 }
 
-export function calcOpacity(num) {
+export function calcOpacity(num: number) {
   /* Events have opacity 0.5 by default, and get added to according to how many
    * other events there are in the same render. The idea here is that the
    * overlaying of events builds up a 'heat map' of the event space, where

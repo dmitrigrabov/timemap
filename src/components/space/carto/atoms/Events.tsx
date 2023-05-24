@@ -1,13 +1,12 @@
-import React from 'react'
 import { Portal } from 'react-portal'
-import { primaryHighlight, darkBackground } from '../../../../common/global'
-import ColoredMarkers from '../../../atoms/ColoredMarkers'
+import { primaryHighlight, darkBackground } from 'common/global'
+import ColoredMarkers from 'components/atoms/ColoredMarkers'
 import hash from 'object-hash'
 import {
   calcOpacity,
   calculateColorPercentages,
   zipColorsToPercentages
-} from '../../../../common/utilities'
+} from 'common/utilities'
 
 function MapEvents({
   getCategoryColor,
@@ -61,7 +60,9 @@ function MapEvents({
       longitude: '32.2'
     }
     */
-    if (!location.latitude || !location.longitude) return null
+    if (!location.latitude || !location.longitude) {
+      return null
+    }
     const { x, y } = projectPoint([location.latitude, location.longitude])
 
     // in narrative mode, only render events in narrative

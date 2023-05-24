@@ -9,15 +9,24 @@ import {
 } from 'common/utilities'
 import { isTimeRangedIn } from 'selectors/helpers'
 import { SHAPE } from 'common/constants'
-import { StoreState } from 'store/types'
+import {
+  CategoryAssociation,
+  FilterAssociation,
+  NarrativeAssociation,
+  StoreState
+} from 'store/types'
 
 // Input selectors
 export const getEvents = (state: StoreState) => state.domain.events
 export const getCategories = (state: StoreState) => {
-  return state.domain.associations.filter(item => item.mode === 'CATEGORY')
+  return state.domain.associations.filter(
+    (item): item is CategoryAssociation => item.mode === 'CATEGORY'
+  )
 }
 export const getNarratives = (state: StoreState) => {
-  return state.domain.associations.filter(item => item.mode === 'NARRATIVE')
+  return state.domain.associations.filter(
+    (item): item is NarrativeAssociation => item.mode === 'NARRATIVE'
+  )
 }
 export const getActiveNarrative = (state: StoreState) => {
   state.app.associations.narrative
@@ -28,7 +37,9 @@ export const getSources = (state: StoreState) => state.domain.sources
 export const getRegions = (state: StoreState) => state.domain.regions
 export const getShapes = (state: StoreState) => state.domain.shapes
 export const getFilters = (state: StoreState) => {
-  return state.domain.associations.filter(item => item.mode === 'FILTER')
+  return state.domain.associations.filter(
+    (item): item is FilterAssociation => item.mode === 'FILTER'
+  )
 }
 export const getNotifications = (state: StoreState) => {
   return state.domain.notifications
@@ -154,34 +165,37 @@ export const selectEventCountInTimeRange = createSelector(
     )
 )
 
+const narrativeSkeleton = (id: string) => ({ id, steps: [] })
+
 /**
  * Of all available events, selects those that fall within the time range,
  * and if filters are being used, select them if their filters are enabled
  */
 export const selectNarratives = createSelector(
   [getEvents, getNarratives, getSources],
-  (events, narrativesMeta, sources) => {
+  (events, narrativesMeta, sources): NarrativeAssociation[] => {
     if (Array.isArray(narrativesMeta) && narrativesMeta.length === 0) {
       return []
     }
+
     const narratives = {}
-    const narrativeSkeleton = id => ({ id, steps: [] })
 
     /* populate narratives dict with events */
-    events.forEach(evt => {
-      evt.associations.forEach(association => {
+    events.forEach(event => {
+      event.associations.forEach(association => {
         const foundNarrative = narrativesMeta.find(
-          narr => narr.id === association
+          narrative => narrative.id === association
         )
+
         if (foundNarrative) {
           const { id: narrId } = foundNarrative
           // initialise
           if (!narratives[narrId]) {
             narratives[narrId] = narrativeSkeleton(narrId)
           }
-          // add evt to steps
+          // add event to steps
           // NB: insetSourceFrom is a 'curried' function to allow with maps
-          narratives[narrId].steps.push(insetSourceFrom(sources)(evt))
+          narratives[narrId].steps.push(insetSourceFrom(sources)(event))
         }
       })
     })

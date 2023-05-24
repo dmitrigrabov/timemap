@@ -8,7 +8,7 @@ import regionSchema from 'reducers/validate/regionSchema'
 import shapeSchema from 'reducers/validate/shapeSchema'
 
 import { calcDatetime, capitalize } from 'common/utilities'
-import { DomainState, FeaturesState } from 'store/types'
+import { Associations, DomainState, FeaturesState } from 'store/types'
 
 /*
  * Create an error notification object
@@ -119,6 +119,7 @@ export function validateDomain(domain: DomainState, features: FeaturesState) {
   }
 
   const eventSchema = createEventSchema(features.CUSTOM_EVENT_FIELDS)
+
   validateArray(domain.events, 'events', eventSchema)
   validateArray(domain.sites, 'sites', siteSchema)
   validateArray(domain.associations, 'associations', associationsSchema)
@@ -165,20 +166,26 @@ export function validateDomain(domain: DomainState, features: FeaturesState) {
     let errorMsg = ''
     event.id = idx
     // event.associations comes in as a [association.ids...]; convert to actual association objects
-    event.associations = event.associations.reduce((acc, id) => {
-      const foundAssociation = sanitizedDomain.associations.find(
-        elem => elem.id === id
-      )
-      if (foundAssociation) {
-        acc.push(foundAssociation)
-      }
-      return acc
-    }, [])
+    event.associations = event.associations.reduce<Associations[]>(
+      (acc, id) => {
+        const foundAssociation = sanitizedDomain.associations.find(
+          association => association.id === id
+        )
+
+        if (foundAssociation) {
+          acc.push(foundAssociation)
+        }
+
+        return acc
+      },
+      []
+    )
 
     if (event.shape) {
       const relatedShapeObj = sanitizedDomain.shapes.find(
-        elem => elem.id === event.shape
+        shape => shape.id === event.shape
       )
+
       if (!relatedShapeObj) {
         errorMsg =
           'Failed to find related shape. Please verify shape type for event.'

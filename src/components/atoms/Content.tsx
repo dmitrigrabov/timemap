@@ -1,9 +1,8 @@
-import React from 'react'
 import { Player } from 'video-react'
 import Img from 'react-image'
-import Md from './Md'
-import Spinner from './Spinner'
-import NoSource from './NoSource'
+import Md from 'components/atoms/Md'
+import Spinner from 'components/atoms/Spinner'
+import NoSource from 'components/atoms/NoSource'
 
 const Content = ({ media, viewIdx, translations, switchLanguage, langIdx }) => {
   const el = document.querySelector('.source-media-gallery')
@@ -88,7 +87,7 @@ const Content = ({ media, viewIdx, translations, switchLanguage, langIdx }) => {
       className="source-media-gallery"
       style={{ transform: `translate(${viewIdx * -shiftW}px)` }}
     >
-      {media.map(m => renderMedia(m))}
+      {media.map(mediaItem => renderMedia(mediaItem))}
     </div>
   )
 }

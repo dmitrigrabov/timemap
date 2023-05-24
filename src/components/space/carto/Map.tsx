@@ -1,24 +1,24 @@
 /* global L */
 import { bindActionCreators } from 'redux'
 import 'leaflet'
-import React from 'react'
+import { Component } from 'react'
 import { flushSync } from 'react-dom'
 import { Portal } from 'react-portal'
 import Supercluster from 'supercluster'
 
 import { connect } from 'react-redux'
-import * as selectors from '../../../selectors'
-import * as actions from '../../../actions'
+import * as selectors from 'selectors'
+import * as actions from 'actions'
 
-import Sites from './atoms/Sites'
-import Regions from './atoms/Regions'
-import Events from './atoms/Events'
-import Clusters from './atoms/Clusters'
-import SelectedEvents from './atoms/SelectedEvents'
-import Narratives from './atoms/Narratives'
-import DefsMarkers from './atoms/DefsMarkers'
-import SatelliteOverlayToggle from './atoms/SatelliteOverlayToggle'
-import LoadingOverlay from '../../atoms/Loading'
+import Sites from 'components/space/carto/atoms/Sites'
+import Regions from 'components/space/carto/atoms/Regions'
+import Events from 'components/space/carto/atoms/Events'
+import Clusters from 'components/space/carto/atoms/Clusters'
+import SelectedEvents from 'components/space/carto/atoms/SelectedEvents'
+import Narratives from 'components/space/carto/atoms/Narratives'
+import DefsMarkers from 'components/space/carto/atoms/DefsMarkers'
+import SatelliteOverlayToggle from 'components/space/carto/atoms/SatelliteOverlayToggle'
+import LoadingOverlay from 'components/atoms/Loading'
 
 import {
   mapClustersToLocations,
@@ -27,21 +27,23 @@ import {
   isLongitude,
   calculateTotalClusterPoints,
   calcClusterSize
-} from '../../../common/utilities'
+} from 'common/utilities'
+import { AppDispatch } from 'store'
+import { StoreState } from 'store/types'
 
 // NB: important constants for map, TODO: make statics
 // Note: Base map is OpenStreetMaps by default; can choose another base map
 const supportedMapboxMap = ['streets', 'satellite']
 const defaultToken = 'your_token'
 
-class Map extends React.Component {
+class Map extends Component {
   constructor() {
     super()
     this.projectPoint = this.projectPoint.bind(this)
     this.onClusterSelect = this.onClusterSelect.bind(this)
     this.loadClusterData = this.loadClusterData.bind(this)
     this.getClusterChildren = this.getClusterChildren.bind(this)
-    this.svgRef = React.createRef()
+    this.svgRef = createRef()
     this.map = null
     this.superclusterIndex = null
     this.tileLayer = null
@@ -163,12 +165,14 @@ class Map extends React.Component {
       })
     })
     map.on('zoomstart', () => {
-      if (this.svgRef.current !== null)
+      if (this.svgRef.current !== null) {
         this.svgRef.current.classList.add('hide')
+      }
     })
     map.on('zoomend', () => {
-      if (this.svgRef.current !== null)
+      if (this.svgRef.current !== null) {
         this.svgRef.current.classList.remove('hide')
+      }
     })
     window.addEventListener('resize', () => {
       this.alignLayers()
@@ -270,7 +274,9 @@ class Map extends React.Component {
 
   alignLayers() {
     const mapNode = document.querySelector('.leaflet-map-pane')
-    if (mapNode === null) return { transformX: 0, transformY: 0 }
+    if (mapNode === null) {
+      return { transformX: 0, transformY: 0 }
+    }
 
     // We'll get the transform of the leaflet container,
     // which will let us offset the SVG by the same quantity
@@ -531,7 +537,7 @@ class Map extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: StoreState) {
   return {
     domain: {
       locations: selectors.selectLocations(state),
@@ -569,7 +575,7 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: AppDispatch) {
   return {
     actions: bindActionCreators(actions, dispatch)
   }

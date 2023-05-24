@@ -1,6 +1,24 @@
 import { DEFAULT_CHECKBOX_COLOR } from 'common/constants'
+import { CSSProperties, FC } from 'react'
 
-const Checkbox = ({ label, isActive, onClickCheckbox, color, styleProps }) => {
+type CheckboxProps = {
+  label: string
+  isActive: boolean
+  onClickCheckbox: () => void
+  color: string
+  styleProps?: {
+    checkboxStyles: CSSProperties
+    containerStyles: CSSProperties
+  }
+}
+
+const Checkbox: FC<CheckboxProps> = ({
+  label,
+  isActive,
+  onClickCheckbox,
+  color,
+  styleProps
+}) => {
   const checkboxColor = color ? color : DEFAULT_CHECKBOX_COLOR
 
   const baseStyles = {
@@ -17,7 +35,7 @@ const Checkbox = ({ label, isActive, onClickCheckbox, color, styleProps }) => {
 
   return (
     <div className={isActive ? 'item active' : 'item'}>
-      <span style={{ color: color }}>{label}</span>
+      <span style={{ color }}>{label}</span>
       <button onClick={onClickCheckbox}>
         <div className="border" style={containerStyles}>
           <div className="checkbox" style={checkboxStyles} />

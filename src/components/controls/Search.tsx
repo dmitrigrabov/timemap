@@ -9,6 +9,7 @@ import { Event } from 'store/types'
 type SearchProps = {
   queryString: string
   events: Event[]
+  actions: typeof actions
 }
 
 type SearchState = {

@@ -1,7 +1,19 @@
-import React from 'react'
-import { getCoordinatesForPercent } from '../../common/utilities'
+import { getCoordinatesForPercent } from 'common/utilities'
+import { CSSProperties, FC } from 'react'
 
-function ColoredMarkers({ radius, colorPercentMap, styles, className }) {
+type ColoredMarkersProps = {
+  radius: number
+  className: string
+  colorPercentMap: Record<string, number>
+  styles: CSSProperties
+}
+
+const ColoredMarkers: FC<ColoredMarkersProps> = ({
+  radius,
+  colorPercentMap,
+  styles,
+  className
+}) => {
   let cumulativeAngleSweep = 0
   const colors = Object.keys(colorPercentMap)
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Portal } from 'react-portal'
 
 function MapRegions({ svg, regions, projectPoint, styles }) {
@@ -33,7 +32,9 @@ function MapRegions({ svg, regions, projectPoint, styles }) {
     })
   }
 
-  if (!regions || !regions.length) return null
+  if (!regions || !regions.length) {
+    return null
+  }
 
   return (
     <Portal node={svg}>

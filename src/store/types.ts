@@ -184,6 +184,33 @@ export type Event = {
   description: string
   date: string
   time: string
+  time_precision: string
+  location: string
+  latitude: string
+  longitude: string
+
+  x: string
+  y: string
+  z: string
+
+  type: string
+  category: string
+  category_full: string
+  associations: string[]
+  sources: Source[]
+  comments: string
+  time_display: string
+
+  narrative__stepStyles: unknown[]
+  shape: string
+  colour: string
+}
+
+export type EventEnriched = {
+  id: number
+  description: string
+  date: string
+  time: string
   datetime: Date
   time_precision: string
   location: string

@@ -23,11 +23,22 @@ import {
 } from 'common/utilities'
 import { ToolbarButton } from 'components/controls/atoms/ToolbarButton'
 import { FullscreenToggle } from 'components/controls/FullScreenToggle'
-import { StoreState } from 'store/types'
+import {
+  StoreState,
+  FilterAssociation,
+  CategoryAssociation,
+  FeaturesState
+} from 'store/types'
 import { AppDispatch } from 'store'
 
-class Toolbar extends Component {
-  constructor(props) {
+type ToolbarProps = {
+  filters: FilterAssociation[]
+  categories: CategoryAssociation[]
+  features: FeaturesState
+}
+
+class Toolbar extends Component<ToolbarProps> {
+  constructor(props: ToolbarProps) {
     super(props)
     this.onSelectFilter = this.onSelectFilter.bind(this)
     this.state = { _selected: -1 }
