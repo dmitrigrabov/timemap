@@ -32,7 +32,7 @@ class Search extends Component<SearchProps, SearchState> {
     })
   }
 
-  updateSearchQuery(e: ChangeEvent) {
+  updateSearchQuery(e: ChangeEvent<HTMLInputElement>) {
     const queryString = e.target.value
     this.props.actions.updateSearchQuery(queryString)
   }

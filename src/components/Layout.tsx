@@ -185,7 +185,7 @@ class Dashboard extends Component<StoreState> {
     })
   }
 
-  selectNarrativeStep(idx) {
+  selectNarrativeStep(idx: number) {
     // Try to find idx if event passed rather than number
     if (typeof idx !== 'number') {
       const e = idx[0] || idx

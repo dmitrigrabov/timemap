@@ -16,7 +16,9 @@ import {
   Source,
   TimeRange,
   Notification,
-  Shape
+  Shape,
+  Associations,
+  Narative
 } from 'store/types'
 
 // TODO: relegate these URLs entirely to environment variables
@@ -204,15 +206,23 @@ export const clearFilter = (filter: string): ClearFilterAction => ({
   filter
 })
 
-export const TOGGLE_ASSOCIATIONS = 'TOGGLE_ASSOCIATIONS'
-export function toggleAssociations(association, value, shouldColor) {
-  return {
-    type: TOGGLE_ASSOCIATIONS,
-    association,
-    value,
-    shouldColor
-  }
+export type ToggleAssociationsAction = {
+  type: 'TOGGLE_ASSOCIATIONS'
+  association: 'filters' | 'categories'
+  value: Associations | Associations[]
+  shouldColor?: boolean
 }
+
+export const toggleAssociations = (
+  association: 'filters' | 'categories',
+  value: Associations | Associations[],
+  shouldColor?: boolean
+): ToggleAssociationsAction => ({
+  type: 'TOGGLE_ASSOCIATIONS',
+  association,
+  value,
+  shouldColor
+})
 
 export type ToggleShapesAction = {
   type: 'TOGGLE_SHAPES'
@@ -239,13 +249,15 @@ export const setNotLoading = (): SetNotLoadingAction => ({
   type: 'SET_NOT_LOADING'
 })
 
-export const SET_INITIAL_CATEGORIES = 'SET_INITIAL_CATEGORIES'
-export function setInitialCategories(values) {
-  return {
-    type: SET_INITIAL_CATEGORIES,
-    values
-  }
+export type SetInitialCategoriesAction = {
+  type: 'SET_INITIAL_CATEGORIES'
+  values: Associations[]
 }
+
+export const setInitialCategories = (values: Associations[]) => ({
+  type: 'SET_INITIAL_CATEGORIES',
+  values
+})
 
 export type SetInitialShapesAction = {
   type: 'SET_INITIAL_SHAPES'
@@ -278,10 +290,14 @@ export const updateDimensions = (dims: Dimensions): UpdateDimensionsAction => ({
   dims
 })
 
-export const UPDATE_NARRATIVE = 'UPDATE_NARRATIVE'
-export function updateNarrative(narrative) {
+export type UpdateNarativeAction = {
+  type: 'UPDATE_NARRATIVE'
+  narrative: Narative
+}
+
+export const updateNarrative = (narrative: Narative): UpdateNarativeAction => {
   return {
-    type: UPDATE_NARRATIVE,
+    type: 'UPDATE_NARRATIVE',
     narrative
   }
 }
@@ -423,29 +439,32 @@ export const toggleSatelliteView = (): ToggleSatelliteViewAction => ({
 })
 
 export type ActionTypes =
-  | ToggleFetchingDomainAction
-  | UpdateHighlightedAction
-  | FetchErrorAction
-  | UpdateTicksAction
-  | ToggleLanguageAction
-  | ToggleSatelliteViewAction
-  | UpdateSearchQueryAction
-  | ToggleCoverAction
-  | MarkNotificationsReadAction
-  | ToggleNotificationsAction
-  | ToggleIntroPopupAction
-  | ToggleInfoPopupAction
-  | CloseToolbarAction
-  | ToggleSitesAction
-  | SetLoadingAction
-  | UpdateSourceAction
-  | UpdateNarrativeStepIdxAction
-  | UpdateDimensionsAction
-  | UpdateSelectedAction
   | ClearFilterAction
+  | CloseToolbarAction
+  | FetchErrorAction
+  | MarkNotificationsReadAction
+  | SetInitialCategoriesAction
+  | SetInitialCategoriesAction
+  | SetInitialShapesAction
+  | SetLoadingAction
   | SetLoadingAction
   | SetNotLoadingAction
-  | UpdateTimeRangeAction
-  | UpdateNarrativeStepIdxAction
-  | SetInitialShapesAction
+  | ToggleAssociationsAction
+  | ToggleCoverAction
+  | ToggleFetchingDomainAction
+  | ToggleInfoPopupAction
+  | ToggleIntroPopupAction
+  | ToggleLanguageAction
+  | ToggleNotificationsAction
+  | ToggleSatelliteViewAction
   | ToggleShapesAction
+  | ToggleSitesAction
+  | UpdateDimensionsAction
+  | UpdateHighlightedAction
+  | UpdateNarativeAction
+  | UpdateNarrativeStepIdxAction
+  | UpdateSearchQueryAction
+  | UpdateSelectedAction
+  | UpdateSourceAction
+  | UpdateTicksAction
+  | UpdateTimeRangeAction

@@ -1,14 +1,30 @@
-import React from 'react'
-import { axisBottom, timeFormat, select } from 'd3'
-import { setD3Locale } from '../../common/utilities'
+import { Component, createRef } from 'react'
+import { axisBottom, timeFormat, select, AxisScale, AxisDomain } from 'd3'
+import { setD3Locale } from 'common/utilities'
+import { Dimensions } from 'store/types'
 
 const TEXT_HEIGHT = 15
 setD3Locale()
-class TimelineAxis extends React.Component {
-  constructor() {
-    super()
-    this.xAxis0Ref = React.createRef()
-    this.xAxis1Ref = React.createRef()
+
+type TimelineAxisProps<Domain extends AxisDomain> = {
+  dims: Dimensions
+  extent: number
+  scaleX: AxisScale<Domain>
+  ticks: number
+}
+
+type TimelineAxisState = {
+  isInitialized: boolean
+}
+
+class TimelineAxis<Domain extends AxisDomain> extends Component<
+  TimelineAxisProps<Domain>,
+  TimelineAxisState
+> {
+  constructor(props: TimelineAxisProps<Domain>) {
+    super(props)
+    this.xAxis0Ref = createRef()
+    this.xAxis1Ref = createRef()
     this.state = {
       isInitialized: false
     }
@@ -45,7 +61,9 @@ class TimelineAxis extends React.Component {
         .tickSize(0)
         .tickFormat(timeFormat(sndFmt))
 
-      if (!this.state.isInitialized) this.setState({ isInitialized: true })
+      if (!this.state.isInitialized) {
+        this.setState({ isInitialized: true })
+      }
     }
 
     if (this.state.isInitialized) {

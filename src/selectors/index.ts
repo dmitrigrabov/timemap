@@ -55,7 +55,7 @@ export const selectSites = createSelector(
   [getSites, getFeatures],
   (sites, features) => {
     if (features.USE_SITES) {
-      return sites.filter(s => !!+s.enabled)
+      return sites.filter(site => !!+site.enabled)
     }
     return []
   }

@@ -1,6 +1,7 @@
 import initial from 'store/initial'
 import { validateDomain } from 'reducers/validate/validators'
 import { DomainState } from 'store/types'
+import { ActionTypes } from 'actions'
 
 function updateDomain(domainState: DomainState, action) {
   return {
@@ -19,7 +20,7 @@ function markNotificationsRead(domainState: DomainState, action) {
   }
 }
 
-function domain(domainState = initial.domain, action) {
+function domain(domainState = initial.domain, action: ActionTypes) {
   switch (action.type) {
     case 'UPDATE_DOMAIN':
       return updateDomain(domainState, action)

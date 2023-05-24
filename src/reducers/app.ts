@@ -14,7 +14,9 @@ import {
   UpdateSearchQueryAction,
   UpdateTimeRangeAction,
   SetInitialShapesAction,
-  ToggleShapesAction
+  ToggleShapesAction,
+  SetInitialCategoriesAction,
+  ToggleAssociationsAction
 } from 'actions'
 import { AppState } from 'store/types'
 
@@ -152,18 +154,21 @@ const updateNarrativeStepIdx = (
   }
 }
 
-function toggleAssociations(appState, action) {
-  if (!(action.value instanceof Array)) {
-    action.value = [action.value]
-  }
+const toggleAssociations = (
+  appState: AppState,
+  action: ToggleAssociationsAction
+): AppState => {
+  const values = Array.isArray(action.value) ? action.value : [action.value]
+
   const { association: associationType } = action
 
   let newAssociations = appState.associations[associationType].slice(0)
-  action.value.forEach(vl => {
-    if (newAssociations.includes(vl)) {
-      newAssociations = newAssociations.filter(s => s !== vl)
+
+  values.forEach(value => {
+    if (newAssociations.includes(value)) {
+      newAssociations = newAssociations.filter(s => s !== value)
     } else {
-      newAssociations.push(vl)
+      newAssociations.push(value)
     }
   })
 
@@ -280,8 +285,11 @@ const setNotLoading = (appState: AppState): AppState => {
   }
 }
 
-function setInitialCategories(appState, action) {
-  const categories = action.values.reduce((acc, val) => {
+const setInitialCategories = (
+  appState: AppState,
+  action: SetInitialCategoriesAction
+): AppState => {
+  const categories = action.values.reduce<string[]>((acc, val) => {
     if (val.mode === 'CATEGORY') {
       acc.push(val.title)
     }

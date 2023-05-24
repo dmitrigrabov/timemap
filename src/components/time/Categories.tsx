@@ -1,10 +1,25 @@
-import React from 'react'
+import { Component, createRef } from 'react'
 import { drag as d3Drag, select } from 'd3'
+import { Dimensions, FeaturesState } from 'store/types'
 
-class TimelineCategories extends React.Component {
-  constructor(props) {
+type TimelineCategoriesProps = {
+  dims: Dimensions
+  features: FeaturesState
+  categories: string[]
+  fallbackLabel: string
+}
+
+type TimelineCategoriesState = {
+  isInitialized: boolean
+}
+
+class TimelineCategories extends Component<
+  TimelineCategoriesProps,
+  TimelineCategoriesState
+> {
+  constructor(props: TimelineCategoriesProps) {
     super(props)
-    this.grabRef = React.createRef()
+    this.grabRef = createRef()
     this.state = {
       isInitialized: false
     }
@@ -23,7 +38,7 @@ class TimelineCategories extends React.Component {
     }
   }
 
-  renderCategory(cat, idx) {
+  renderCategory(cat: string) {
     const { features, dims } = this.props
     const strokeWidth = 1 // dims.trackHeight / (this.props.categories.length + 1)
     if (
@@ -61,8 +76,8 @@ class TimelineCategories extends React.Component {
     const { dims, categories, fallbackLabel } = this.props
     const categoriesExist = categories && categories.length > 0
     const renderedCategories = categoriesExist
-      ? categories.map((cat, idx) => this.renderCategory(cat, idx))
-      : this.renderCategory(fallbackLabel, 0)
+      ? categories.map(cat => this.renderCategory(cat))
+      : this.renderCategory(fallbackLabel)
 
     return (
       <g className="yAxis">

@@ -1,15 +1,15 @@
-import React from 'react'
+import { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as actions from '../actions'
-import * as selectors from '../selectors'
+import * as actions from 'actions'
+import * as selectors from 'selectors'
 
 import { Tabs, TabList, TabPanel } from 'react-tabs'
-import FilterListPanel from './controls/FilterListPanel'
-import CategoriesListPanel from './controls/CategoriesListPanel'
-import ShapesListPanel from './controls/ShapesListPanel'
-import BottomActions from './controls/BottomActions'
-import copy from '../common/data/copy.json'
+import FilterListPanel from 'components/controls/FilterListPanel'
+import CategoriesListPanel from 'components/controls/CategoriesListPanel'
+import ShapesListPanel from 'components/controls/ShapesListPanel'
+import BottomActions from 'components/controls/BottomActions'
+import copy from 'common/data/copy.json'
 import {
   trimAndEllipse,
   getImmediateFilterParent,
@@ -20,11 +20,13 @@ import {
   mapCategoriesToPaths,
   getCategoryIdxs,
   getFilterIdx
-} from '../common/utilities.js'
-import { ToolbarButton } from './controls/atoms/ToolbarButton'
-import { FullscreenToggle } from './controls/FullScreenToggle'
+} from 'common/utilities'
+import { ToolbarButton } from 'components/controls/atoms/ToolbarButton'
+import { FullscreenToggle } from 'components/controls/FullScreenToggle'
+import { StoreState } from 'store/types'
+import { AppDispatch } from 'store'
 
-class Toolbar extends React.Component {
+class Toolbar extends Component {
   constructor(props) {
     super(props)
     this.onSelectFilter = this.onSelectFilter.bind(this)
@@ -253,7 +255,9 @@ class Toolbar extends React.Component {
     const { features, narratives, toolbarCopy } = this.props
     const narrativesExist = narratives && narratives.length !== 0
     let title = copy[this.props.language].toolbar.title
-    if (process.env.display_title) title = process.env.display_title
+    if (process.env.display_title) {
+      title = process.env.display_title
+    }
     const { panels } = toolbarCopy
 
     const narrativesIdx = 0
@@ -340,7 +344,7 @@ class Toolbar extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: StoreState) {
   return {
     filters: selectors.getFilters(state),
     categories: selectors.getCategories(state),
@@ -363,7 +367,7 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: AppDispatch) {
   return {
     actions: bindActionCreators(actions, dispatch)
   }

@@ -35,11 +35,45 @@ export type Views = {
   sites: boolean
 }
 
-export type Associations = {
+export type AssociationMode = 'CATEGORY' | 'NARRATIVE' | 'FILTER'
+
+export type Association = {
+  id: string
+  title: string
+  desc: string
+  filter_paths: string[]
+}
+
+export type FilterAssociation = {
+  mode: 'FILTER'
+} & Association
+
+export type NarrativeAssociation = {
+  mode: 'NARRATIVE'
+} & Association
+
+export type CategoryAssociation = {
+  mode: 'CATEGORY'
+} & Association
+
+export type Associations =
+  | FilterAssociation
+  | NarrativeAssociation
+  | CategoryAssociation
+
+export type Narative = {
+  id: string
+  label: string
+  description: string
+  withLines: boolean
+  steps: Event[]
+}
+
+export type AssociationsObject = {
   coloringSet: unknown[]
-  filters: unknown[]
-  narrative: unknown
-  categories: unknown[]
+  filters: FilterAssociation[]
+  narrative: Narative
+  categories: CategoryAssociation[]
   views: Views
 }
 
@@ -112,7 +146,7 @@ export type AppState = {
   highlighted: unknown
   selected: Event[]
   source: Source
-  associations: Associations
+  associations: AssociationsObject
   shapes: string[]
   isMobile: boolean
   language: Language
@@ -128,14 +162,6 @@ export type AppState = {
   narrativeState: {
     current: number
   }
-}
-
-export type Association = {
-  id: string
-  title: string
-  desc: string
-  mode: string
-  filter_paths: unknown[]
 }
 
 export type Source = {
@@ -158,6 +184,7 @@ export type Event = {
   description: string
   date: string
   time: string
+  datetime: Date
   time_precision: string
   location: string
   latitude: string
@@ -170,7 +197,7 @@ export type Event = {
   type: string
   category: string
   category_full: string
-  associations: Association[]
+  associations: Associations[]
   sources: Source[]
   comments: string
   time_display: string
@@ -180,12 +207,21 @@ export type Event = {
   colour: string
 }
 
+export type Site = {
+  id: string
+  description: string
+  site: string
+  latitude: string
+  longitude: string
+  enabled: string
+}
+
 export type DomainState = {
   events: Event[]
   categories: unknown[]
-  associations: unknown[]
+  associations: Associations[]
   sources: unknown
-  sites: Source[]
+  sites: Site[]
   shapes: unknown[]
   regions: unknown[]
   notifications: unknown[]
@@ -243,13 +279,17 @@ export type UiState = {
   eventRadius: number
 }
 
+export type GraphNonLocated = {
+  categories: string[]
+}
+
 export type FeaturesState = {
   USE_COVER: boolean
   USE_ASSOCIATIONS: boolean
   USE_SITES: boolean
   USE_SOURCES: boolean
   USE_REGIONS: boolean
-  GRAPH_NONLOCATED: boolean
+  GRAPH_NONLOCATED: GraphNonLocated
   HIGHLIGHT_GROUPS: boolean
   USE_SHAPES: boolean
 }

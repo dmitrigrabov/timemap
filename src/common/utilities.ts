@@ -12,12 +12,12 @@ const TIME_FMT = timeFormat ?? 'HH:mm'
 
 export const language = /* process.env.store.app.language || */ 'en-US'
 
-export function getPathLeaf(path) {
+export function getPathLeaf(path: string) {
   const splitPath = path.split('/')
   return splitPath[splitPath.length - 1]
 }
 
-export function calcDatetime(date, time) {
+export function calcDatetime(date: string, time: string) {
   if (!time) {
     time = '00:00'
   }
@@ -25,7 +25,7 @@ export function calcDatetime(date, time) {
   return dt.toDate()
 }
 
-export function getCoordinatesForPercent(radius, percent) {
+export function getCoordinatesForPercent(radius: number, percent: number) {
   const x = radius * Math.cos(2 * Math.PI * percent)
   const y = radius * Math.sin(2 * Math.PI * percent)
   return [x, y]
@@ -55,7 +55,7 @@ export function zipColorsToPercentages(colors, percentages) {
  * @param {string} name: name of paramater to search
  * @param {string} url: url passed as variable, defaults to window.location.href
  */
-export function getParameterByName(name, url) {
+export function getParameterByName(name: string, url: string) {
   if (!url) {
     url = globalThis.window.location.href
   }
@@ -92,7 +92,7 @@ export function areEqual(arr1, arr2) {
  * Return whether the variable is neither null nor undefined
  * @param {object} variable
  */
-export function isNotNullNorUndefined(variable) {
+export function isNotNullNorUndefined(variable: unknown) {
   return typeof variable !== 'undefined' && variable !== null
 }
 
@@ -103,7 +103,7 @@ export function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
-export function trimAndEllipse(string, stringNum) {
+export function trimAndEllipse(string: string, stringNum: number) {
   if (string.length > stringNum) {
     return string.substring(0, 120) + '...'
   }
