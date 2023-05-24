@@ -1,9 +1,3 @@
-export const ASSOCIATION_MODES = {
-  CATEGORY: 'CATEGORY',
-  NARRATIVE: 'NARRATIVE',
-  FILTER: 'FILTER'
-}
-
 export const SHAPE = 'SHAPE'
 
 export const DEFAULT_TAB_ICONS = {

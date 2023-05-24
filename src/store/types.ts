@@ -14,10 +14,12 @@ export type Dimensions = {
   width_controls: number
 }
 
+export type TimeRange = [Date, Date] | [Date] | []
+
 export type Timeline = {
   dimensions: Dimensions
-  range: [Date, Date]
-  rangeLimits: [Date, Date]
+  range: TimeRange
+  rangeLimits: TimeRange
   zoomLevels: ZoomLevel[]
 }
 
@@ -88,16 +90,32 @@ export type Map = {
   startZoom: number
 }
 
+export type Notification = {
+  message: string
+  type: 'error'
+}
+
+export type Language = 'en-US' | 'es-MX'
+
+export type Shape = {
+  id: string
+  title: string
+  shape: string
+  colour: string
+}
+
 export type AppState = {
   debug: boolean
   errors: Errors
+  error?: string
+  notifications: Notification[]
   highlighted: unknown
-  selected: unknown[]
-  source: unknown
+  selected: Event[]
+  source: Source
   associations: Associations
-  shapes: unknown[]
+  shapes: string[]
   isMobile: boolean
-  language: 'en-US'
+  language: Language
   cluster: Cluster
   timeline: Timeline
   flags: Flags
@@ -105,6 +123,11 @@ export type AppState = {
   toolbar: Toolbar
   loading: boolean
   map?: Map
+  searchQuery?: string
+  filters: Record<string, unknown[]>
+  narrativeState: {
+    current: number
+  }
 }
 
 export type Association = {

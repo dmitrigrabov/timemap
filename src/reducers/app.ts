@@ -1,33 +1,20 @@
 import initial from 'store/initial'
-import { ASSOCIATION_MODES } from 'common/constants'
 import { toggleFlagAC } from 'common/utilities'
 import {
-  UPDATE_SELECTED,
-  UPDATE_COLORING_SET,
-  CLEAR_FILTER,
-  TOGGLE_ASSOCIATIONS,
-  TOGGLE_SHAPES,
-  UPDATE_TIMERANGE,
-  UPDATE_DIMENSIONS,
-  UPDATE_NARRATIVE,
-  UPDATE_NARRATIVE_STEP_IDX,
-  UPDATE_SOURCE,
-  TOGGLE_LANGUAGE,
-  TOGGLE_SITES,
-  TOGGLE_FETCHING_SOURCES,
-  TOGGLE_INFOPOPUP,
-  TOGGLE_INTROPOPUP,
-  TOGGLE_NOTIFICATIONS,
-  TOGGLE_COVER,
-  FETCH_SOURCE_ERROR,
-  SET_LOADING,
-  SET_NOT_LOADING,
-  SET_INITIAL_CATEGORIES,
-  SET_INITIAL_SHAPES,
-  UPDATE_SEARCH_QUERY,
   UpdateHighlightedAction,
-  ActionTypes, 
-  UpdateTicksAction
+  ActionTypes,
+  UpdateTicksAction,
+  UpdateSelectedAction,
+  UpdateNarrativeStepIdxAction,
+  ClearFilterAction,
+  UpdateDimensionsAction,
+  ToggleLanguageAction,
+  UpdateSourceAction,
+  FetchErrorAction,
+  UpdateSearchQueryAction,
+  UpdateTimeRangeAction,
+  SetInitialShapesAction,
+  ToggleShapesAction
 } from 'actions'
 import { AppState } from 'store/types'
 
@@ -40,7 +27,7 @@ const updateHighlighted = (
   })
 }
 
-const updateTicks = (appState: AppState, action:UpdateTicksAction) => ({
+const updateTicks = (appState: AppState, action: UpdateTicksAction) => ({
   ...appState,
   timeline: {
     ...appState.timeline,
@@ -51,7 +38,10 @@ const updateTicks = (appState: AppState, action:UpdateTicksAction) => ({
   }
 })
 
-const updateSelected = (appState:AppState, action) {
+const updateSelected = (
+  appState: AppState,
+  action: UpdateSelectedAction
+): AppState => {
   return Object.assign({}, appState, {
     selected: action.selected
   })
@@ -150,7 +140,10 @@ function updateNarrative(appState, action) {
   }
 }
 
-function updateNarrativeStepIdx(appState, action) {
+const updateNarrativeStepIdx = (
+  appState: AppState,
+  action: UpdateNarrativeStepIdxAction
+): AppState => {
   return {
     ...appState,
     narrativeState: {
@@ -183,7 +176,7 @@ function toggleAssociations(appState, action) {
   }
 }
 
-function toggleShapes(appState, action) {
+const toggleShapes = (appState: AppState, action: ToggleShapesAction) => {
   const newShapes = [...appState.shapes]
   if (newShapes.includes(action.shape)) {
     const idx = newShapes.indexOf(action.shape)
@@ -198,7 +191,10 @@ function toggleShapes(appState, action) {
   }
 }
 
-function clearFilter(appState, action) {
+const clearFilter = (
+  appState: AppState,
+  action: ClearFilterAction
+): AppState => {
   return {
     ...appState,
     filters: {
@@ -208,18 +204,21 @@ function clearFilter(appState, action) {
   }
 }
 
-function updateTimeRange(appState, action) {
-  // XXX
-  return {
-    ...appState,
-    timeline: {
-      ...appState.timeline,
-      range: action.timerange
-    }
+const updateTimeRange = (
+  appState: AppState,
+  action: UpdateTimeRangeAction
+) => ({
+  ...appState,
+  timeline: {
+    ...appState.timeline,
+    range: action.timerange
   }
-}
+})
 
-function updateDimensions(appState, action) {
+const updateDimensions = (
+  appState: AppState,
+  action: UpdateDimensionsAction
+): AppState => {
   return {
     ...appState,
     timeline: {
@@ -232,21 +231,27 @@ function updateDimensions(appState, action) {
   }
 }
 
-function toggleLanguage(appState, action) {
+const toggleLanguage = (
+  appState: AppState,
+  action: ToggleLanguageAction
+): AppState => {
   const otherLanguage = appState.language === 'es-MX' ? 'en-US' : 'es-MX'
   return Object.assign({}, appState, {
     language: action.language || otherLanguage
   })
 }
 
-function updateSource(appState, action) {
+const updateSource = (
+  appState: AppState,
+  action: UpdateSourceAction
+): AppState => {
   return {
     ...appState,
     source: action.source
   }
 }
 
-function fetchError(state, action) {
+const fetchError = (state: AppState, action: FetchErrorAction): AppState => {
   return {
     ...state,
     error: action.message,
@@ -256,30 +261,19 @@ function fetchError(state, action) {
 
 const toggleSites = toggleFlagAC('isShowingSites')
 const toggleFetchingDomain = toggleFlagAC('isFetchingDomain')
-const toggleFetchingSources = toggleFlagAC('isFetchingSources')
 const toggleInfoPopup = toggleFlagAC('isInfopopup')
 const toggleIntroPopup = toggleFlagAC('isIntropopup')
 const toggleNotifications = toggleFlagAC('isNotification')
 const toggleCover = toggleFlagAC('isCover')
 
-function fetchSourceError(appState, action) {
-  return {
-    ...appState,
-    errors: {
-      ...appState.errors,
-      source: action.msg
-    }
-  }
-}
-
-function setLoading(appState) {
+const setLoading = (appState: AppState): AppState => {
   return {
     ...appState,
     loading: true
   }
 }
 
-function setNotLoading(appState) {
+const setNotLoading = (appState: AppState): AppState => {
   return {
     ...appState,
     loading: false
@@ -288,7 +282,7 @@ function setNotLoading(appState) {
 
 function setInitialCategories(appState, action) {
   const categories = action.values.reduce((acc, val) => {
-    if (val.mode === ASSOCIATION_MODES.CATEGORY) {
+    if (val.mode === 'CATEGORY') {
       acc.push(val.title)
     }
     return acc
@@ -303,7 +297,10 @@ function setInitialCategories(appState, action) {
   }
 }
 
-function setInitialShapes(appState, action) {
+const setInitialShapes = (
+  appState: AppState,
+  action: SetInitialShapesAction
+): AppState => {
   const shapeIds = action.values.map(sh => sh.id)
   return {
     ...appState,
@@ -311,7 +308,10 @@ function setInitialShapes(appState, action) {
   }
 }
 
-function updateSearchQuery(appState, action) {
+const updateSearchQuery = (
+  appState: AppState,
+  action: UpdateSearchQueryAction
+): AppState => {
   return {
     ...appState,
     searchQuery: action.searchQuery
@@ -322,59 +322,55 @@ function app(appState = initial.app, action: ActionTypes) {
   switch (action.type) {
     case 'UPDATE_HIGHLIGHTED':
       return updateHighlighted(appState, action)
-    case UPDATE_SELECTED:
+    case 'UPDATE_SELECTED':
       return updateSelected(appState, action)
-    case UPDATE_COLORING_SET:
+    case 'UPDATE_COLORING_SET':
       return updateColoringSet(appState, action)
-    case UPDATE_TICKS:
+    case 'UPDATE_TICKS':
       return updateTicks(appState, action)
-    case CLEAR_FILTER:
+    case 'CLEAR_FILTER':
       return clearFilter(appState, action)
-    case TOGGLE_ASSOCIATIONS:
+    case 'TOGGLE_ASSOCIATIONS':
       return toggleAssociations(appState, action)
-    case TOGGLE_SHAPES:
+    case 'TOGGLE_SHAPES':
       return toggleShapes(appState, action)
-    case UPDATE_TIMERANGE:
+    case 'UPDATE_TIMERANGE':
       return updateTimeRange(appState, action)
-    case UPDATE_DIMENSIONS:
+    case 'UPDATE_DIMENSIONS':
       return updateDimensions(appState, action)
-    case UPDATE_NARRATIVE:
+    case 'UPDATE_NARRATIVE':
       return updateNarrative(appState, action)
-    case UPDATE_NARRATIVE_STEP_IDX:
+    case 'UPDATE_NARRATIVE_STEP_IDX':
       return updateNarrativeStepIdx(appState, action)
-    case UPDATE_SOURCE:
+    case 'UPDATE_SOURCE':
       return updateSource(appState, action)
     /* toggles */
-    case TOGGLE_LANGUAGE:
+    case 'TOGGLE_LANGUAGE':
       return toggleLanguage(appState, action)
-    case TOGGLE_SITES:
+    case 'TOGGLE_SITES':
       return toggleSites(appState)
     case 'TOGGLE_FETCHING_DOMAIN':
       return toggleFetchingDomain(appState)
-    case TOGGLE_FETCHING_SOURCES:
-      return toggleFetchingSources(appState)
-    case TOGGLE_INFOPOPUP:
+    case 'TOGGLE_INFOPOPUP':
       return toggleInfoPopup(appState)
-    case TOGGLE_INTROPOPUP:
+    case 'TOGGLE_INTROPOPUP':
       return toggleIntroPopup(appState)
-    case TOGGLE_NOTIFICATIONS:
+    case 'TOGGLE_NOTIFICATIONS':
       return toggleNotifications(appState)
-    case TOGGLE_COVER:
+    case 'TOGGLE_COVER':
       return toggleCover(appState)
     /* errors */
-    case FETCH_ERROR:
+    case 'FETCH_ERROR':
       return fetchError(appState, action)
-    case FETCH_SOURCE_ERROR:
-      return fetchSourceError(appState, action)
-    case SET_LOADING:
+    case 'SET_LOADING':
       return setLoading(appState)
-    case SET_NOT_LOADING:
+    case 'SET_NOT_LOADING':
       return setNotLoading(appState)
-    case SET_INITIAL_CATEGORIES:
+    case 'SET_INITIAL_CATEGORIES':
       return setInitialCategories(appState, action)
-    case SET_INITIAL_SHAPES:
+    case 'SET_INITIAL_SHAPES':
       return setInitialShapes(appState, action)
-    case UPDATE_SEARCH_QUERY:
+    case 'UPDATE_SEARCH_QUERY':
       return updateSearchQuery(appState, action)
     default:
       return appState

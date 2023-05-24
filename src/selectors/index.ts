@@ -8,20 +8,16 @@ import {
   createFilterPathString
 } from 'common/utilities'
 import { isTimeRangedIn } from 'selectors/helpers'
-import { ASSOCIATION_MODES, SHAPE } from 'common/constants'
+import { SHAPE } from 'common/constants'
 import { StoreState } from 'store/types'
 
 // Input selectors
 export const getEvents = (state: StoreState) => state.domain.events
 export const getCategories = (state: StoreState) => {
-  return state.domain.associations.filter(
-    item => item.mode === ASSOCIATION_MODES.CATEGORY
-  )
+  return state.domain.associations.filter(item => item.mode === 'CATEGORY')
 }
 export const getNarratives = (state: StoreState) => {
-  return state.domain.associations.filter(
-    item => item.mode === ASSOCIATION_MODES.NARRATIVE
-  )
+  return state.domain.associations.filter(item => item.mode === 'NARRATIVE')
 }
 export const getActiveNarrative = (state: StoreState) => {
   state.app.associations.narrative
@@ -32,9 +28,7 @@ export const getSources = (state: StoreState) => state.domain.sources
 export const getRegions = (state: StoreState) => state.domain.regions
 export const getShapes = (state: StoreState) => state.domain.shapes
 export const getFilters = (state: StoreState) => {
-  return state.domain.associations.filter(
-    item => item.mode === ASSOCIATION_MODES.FILTER
-  )
+  return state.domain.associations.filter(item => item.mode === 'FILTER')
 }
 export const getNotifications = (state: StoreState) => {
   return state.domain.notifications
@@ -114,7 +108,7 @@ export const selectEvents = createSelector(
       const isMatchingFilter =
         (event.associations &&
           event.associations
-            .filter(a => a.mode === ASSOCIATION_MODES.FILTER)
+            .filter(a => a.mode === 'FILTER')
             .map(association =>
               activeFilters.includes(createFilterPathString(association))
             )
@@ -124,7 +118,7 @@ export const selectEvents = createSelector(
       const isActiveCategory =
         (event.associations &&
           event.associations
-            .filter(a => a.mode === ASSOCIATION_MODES.CATEGORY)
+            .filter(a => a.mode === 'CATEGORY')
             .map(association => activeCategories.includes(association.title))
             .some(s => s)) ||
         activeCategories.length === 0
@@ -165,8 +159,8 @@ export const selectEventCountInTimeRange = createSelector(
  * and if filters are being used, select them if their filters are enabled
  */
 export const selectNarratives = createSelector(
-  [getEvents, getNarratives, getSources, getFeatures],
-  (events, narrativesMeta, sources, features) => {
+  [getEvents, getNarratives, getSources],
+  (events, narrativesMeta, sources) => {
     if (Array.isArray(narrativesMeta) && narrativesMeta.length === 0) {
       return []
     }

@@ -2,7 +2,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import dayjs from 'dayjs'
 import hash from 'object-hash'
 import { timeFormatDefaultLocale } from 'd3'
-import { ASSOCIATION_MODES, POLYGON_CLIP_PATH } from 'common/constants'
+import { POLYGON_CLIP_PATH } from 'common/constants'
 import { apiRoot, dateFormat, timeFormat } from 'config'
 
 dayjs.extend(customParseFormat)
@@ -224,9 +224,8 @@ export function removeFromColoringSet(coloringSet, filters) {
 }
 
 export function getEventCategories(event, activeCategories) {
-  const eventCats = event.associations.filter(
-    a => a.mode === ASSOCIATION_MODES.CATEGORY
-  )
+  const eventCats = event.associations.filter(a => a.mode === 'CATEGORY')
+
   return eventCats.reduce((acc, val) => {
     const activeCatTitle = activeCategories.find(cat => cat === val.title)
     if (activeCatTitle) {

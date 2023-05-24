@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@dmitrigrabov/eslint-config": "0.0.1",
+    "@types/d3": "^7.4.0",
     "@types/object-hash": "^3.0.2",
     "@types/ramda": "^0.29.1",
     "@types/react": "18.2.6",
@@ -85,14 +86,6 @@
     "sass": "^1.62.1",
     "typescript": "^5.0.4",
     "vite": "^4.3.3"
-  },
-  "lint-staged": {
-    "src/**/*.{ts,tsx}": "eslint --fix"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "browserslist": {
     "production": [

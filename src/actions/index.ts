@@ -8,7 +8,16 @@ import {
   sourcesApiPath
 } from 'config'
 import { AppDispatch } from 'store'
-import { GetState } from 'store/types'
+import {
+  Dimensions,
+  Event,
+  GetState,
+  Language,
+  Source,
+  TimeRange,
+  Notification,
+  Shape
+} from 'store/types'
 
 // TODO: relegate these URLs entirely to environment variables
 // const CONFIG_URL = urlFromEnv('CONFIG_EXT')
@@ -18,11 +27,6 @@ const sourcesUrl = urlFromEnv(sourcesApiPath)
 const sitesUrl = urlFromEnv(sitesApiPath)
 const regionsUrl = urlFromEnv(regionsApiPath)
 const shapesUrl = urlFromEnv(shapesApiPath)
-
-type Notification = {
-  message: string
-  type: 'error'
-}
 
 const domainMsg = (domainType: string) => {
   return `Something went wrong fetching ${domainType}. Check the URL or try disabling them in the config file.`
@@ -168,31 +172,6 @@ export function updateDomain(payload) {
   }
 }
 
-export function fetchSource(source) {
-  return dispatch => {
-    if (!sourcesUrl) {
-      dispatch(fetchSourceError('No source extension specified.'))
-    } else {
-      dispatch(toggleFetchingSources())
-
-      fetch(`${sourcesUrl}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(
-              'No sources are available at the URL specified in the config specified.'
-            )
-          } else {
-            return response.json()
-          }
-        })
-        .catch(err => {
-          dispatch(fetchSourceError(err.message))
-          dispatch(toggleFetchingSources())
-        })
-    }
-  }
-}
-
 export type UpdateHighlightedAction = {
   type: 'UPDATE_HIGHLIGHTED'
   highlighted: boolean
@@ -205,29 +184,25 @@ export const updateHighlighted = (
   highlighted
 })
 
-export const UPDATE_SELECTED = 'UPDATE_SELECTED'
-export function updateSelected(selected) {
-  return {
-    type: UPDATE_SELECTED,
-    selected: selected
-  }
+export type UpdateSelectedAction = {
+  type: 'UPDATE_SELECTED'
+  selected: Event[]
 }
 
-export const UPDATE_DISTRICT = 'UPDATE_DISTRICT'
-export function updateDistrict(district) {
-  return {
-    type: UPDATE_DISTRICT,
-    district
-  }
+export const updateSelected = (selected: Event[]): UpdateSelectedAction => ({
+  type: 'UPDATE_SELECTED',
+  selected: selected
+})
+
+export type ClearFilterAction = {
+  type: 'CLEAR_FILTER'
+  filter: string
 }
 
-export const CLEAR_FILTER = 'CLEAR_FILTER'
-export function clearFilter(filter) {
-  return {
-    type: CLEAR_FILTER,
-    filter
-  }
-}
+export const clearFilter = (filter: string): ClearFilterAction => ({
+  type: 'CLEAR_FILTER',
+  filter
+})
 
 export const TOGGLE_ASSOCIATIONS = 'TOGGLE_ASSOCIATIONS'
 export function toggleAssociations(association, value, shouldColor) {
@@ -239,27 +214,30 @@ export function toggleAssociations(association, value, shouldColor) {
   }
 }
 
-export const TOGGLE_SHAPES = 'TOGGLE_SHAPES'
-export function toggleShapes(shape) {
-  return {
-    type: TOGGLE_SHAPES,
-    shape
-  }
+export type ToggleShapesAction = {
+  type: 'TOGGLE_SHAPES'
+  shape: string
+}
+export const toggleShapes = (shape: string) => ({
+  type: 'TOGGLE_SHAPES',
+  shape
+})
+
+export type SetLoadingAction = {
+  type: 'SET_LOADING'
 }
 
-export const SET_LOADING = 'SET_LOADING'
-export function setLoading() {
-  return {
-    type: SET_LOADING
-  }
+export const setLoading = (): SetLoadingAction => ({
+  type: 'SET_LOADING'
+})
+
+export type SetNotLoadingAction = {
+  type: 'SET_NOT_LOADING'
 }
 
-export const SET_NOT_LOADING = 'SET_NOT_LOADING'
-export function setNotLoading() {
-  return {
-    type: SET_NOT_LOADING
-  }
-}
+export const setNotLoading = (): SetNotLoadingAction => ({
+  type: 'SET_NOT_LOADING'
+})
 
 export const SET_INITIAL_CATEGORIES = 'SET_INITIAL_CATEGORIES'
 export function setInitialCategories(values) {
@@ -269,29 +247,36 @@ export function setInitialCategories(values) {
   }
 }
 
-export const SET_INITIAL_SHAPES = 'SET_INITIAL_SHAPES'
-export function setInitialShapes(values) {
-  return {
-    type: SET_INITIAL_SHAPES,
-    values
-  }
+export type SetInitialShapesAction = {
+  type: 'SET_INITIAL_SHAPES'
+  values: Shape[]
 }
 
-export const UPDATE_TIMERANGE = 'UPDATE_TIMERANGE'
-export function updateTimeRange(timerange) {
-  return {
-    type: UPDATE_TIMERANGE,
-    timerange
-  }
+export const setInitialShapes = (values: Shape[]): SetInitialShapesAction => ({
+  type: 'SET_INITIAL_SHAPES',
+  values
+})
+export type UpdateTimeRangeAction = {
+  type: 'UPDATE_TIMERANGE'
+  timerange: TimeRange
 }
 
-export const UPDATE_DIMENSIONS = 'UPDATE_DIMENSIONS'
-export function updateDimensions(dims) {
-  return {
-    type: UPDATE_DIMENSIONS,
-    dims
-  }
+export const updateTimeRange = (
+  timerange: TimeRange
+): UpdateTimeRangeAction => ({
+  type: 'UPDATE_TIMERANGE',
+  timerange
+})
+
+export type UpdateDimensionsAction = {
+  type: 'UPDATE_DIMENSIONS'
+  dims: Dimensions
 }
+
+export const updateDimensions = (dims: Dimensions): UpdateDimensionsAction => ({
+  type: 'UPDATE_DIMENSIONS',
+  dims
+})
 
 export const UPDATE_NARRATIVE = 'UPDATE_NARRATIVE'
 export function updateNarrative(narrative) {
@@ -301,21 +286,27 @@ export function updateNarrative(narrative) {
   }
 }
 
-export const UPDATE_NARRATIVE_STEP_IDX = 'UPDATE_NARRATIVE_STEP_IDX'
-export function updateNarrativeStepIdx(idx) {
-  return {
-    type: UPDATE_NARRATIVE_STEP_IDX,
-    idx
-  }
+export type UpdateNarrativeStepIdxAction = {
+  type: 'UPDATE_NARRATIVE_STEP_IDX'
+  idx: number
 }
 
-export const UPDATE_SOURCE = 'UPDATE_SOURCE'
-export function updateSource(source) {
-  return {
-    type: UPDATE_SOURCE,
-    source
-  }
+export const updateNarrativeStepIdx = (
+  idx: number
+): UpdateNarrativeStepIdxAction => ({
+  type: 'UPDATE_NARRATIVE_STEP_IDX',
+  idx
+})
+
+export type UpdateSourceAction = {
+  type: 'UPDATE_SOURCE'
+  source: Source
 }
+
+export const updateSource = (source: Source): UpdateSourceAction => ({
+  type: 'UPDATE_SOURCE',
+  source
+})
 
 export const UPDATE_COLORING_SET = 'UPDATE_COLORING_SET'
 export function updateColoringSet(coloringSet) {
@@ -337,12 +328,12 @@ export const updateTicks = (ticks: number): UpdateTicksAction => ({
 
 // UI
 
-export const TOGGLE_SITES = 'TOGGLE_SITES'
-export function toggleSites() {
-  return {
-    type: TOGGLE_SITES
-  }
+export type ToggleSitesAction = {
+  type: 'TOGGLE_SITES'
 }
+export const toggleSites = (): ToggleSitesAction => ({
+  type: 'TOGGLE_SITES'
+})
 
 export type ToggleFetchingDomainAction = {
   type: 'TOGGLE_FETCHING_DOMAIN'
@@ -352,89 +343,109 @@ export const toggleFetchingDomain = (): ToggleFetchingDomainAction => ({
   type: 'TOGGLE_FETCHING_DOMAIN'
 })
 
-export const TOGGLE_FETCHING_SOURCES = 'TOGGLE_FETCHING_SOURCES'
-export function toggleFetchingSources() {
-  return {
-    type: TOGGLE_FETCHING_SOURCES
-  }
+export type ToggleLanguageAction = {
+  type: 'TOGGLE_LANGUAGE'
+  language: Language
 }
 
-export const TOGGLE_LANGUAGE = 'TOGGLE_LANGUAGE'
-export function toggleLanguage(language) {
-  return {
-    type: TOGGLE_LANGUAGE,
-    language
-  }
+export const toggleLanguage = (language: Language): ToggleLanguageAction => ({
+  type: 'TOGGLE_LANGUAGE',
+  language
+})
+
+export type CloseToolbarAction = {
+  type: 'CLOSE_TOOLBAR'
 }
 
-export const CLOSE_TOOLBAR = 'CLOSE_TOOLBAR'
-export function closeToolbar() {
-  return {
-    type: CLOSE_TOOLBAR
-  }
+export const closeToolbar = (): CloseToolbarAction => ({
+  type: 'CLOSE_TOOLBAR'
+})
+
+export type ToggleInfoPopupAction = {
+  type: 'TOGGLE_INFOPOPUP'
 }
 
-export const TOGGLE_INFOPOPUP = 'TOGGLE_INFOPOPUP'
-export function toggleInfoPopup() {
-  return {
-    type: TOGGLE_INFOPOPUP
-  }
+export const toggleInfoPopup = (): ToggleInfoPopupAction => ({
+  type: 'TOGGLE_INFOPOPUP'
+})
+
+export type ToggleIntroPopupAction = {
+  type: 'TOGGLE_INTROPOPUP'
 }
 
-export const TOGGLE_INTROPOPUP = 'TOGGLE_INTROPOPUP'
-export function toggleIntroPopup() {
-  return {
-    type: TOGGLE_INTROPOPUP
-  }
+export const toggleIntroPopup = (): ToggleIntroPopupAction => ({
+  type: 'TOGGLE_INTROPOPUP'
+})
+
+export type ToggleNotificationsAction = {
+  type: 'TOGGLE_NOTIFICATIONS'
 }
 
-export const TOGGLE_NOTIFICATIONS = 'TOGGLE_NOTIFICATIONS'
-export function toggleNotifications() {
-  return {
-    type: TOGGLE_NOTIFICATIONS
-  }
+export const toggleNotifications = (): ToggleNotificationsAction => ({
+  type: 'TOGGLE_NOTIFICATIONS'
+})
+
+export type MarkNotificationsReadAction = {
+  type: 'MARK_NOTIFICATIONS_READ'
 }
 
-export function markNotificationsRead() {
-  return {
-    type: 'MARK_NOTIFICATIONS_READ'
-  }
+export const markNotificationsRead = (): MarkNotificationsReadAction => ({
+  type: 'MARK_NOTIFICATIONS_READ'
+})
+
+export type ToggleCoverAction = {
+  type: 'TOGGLE_COVER'
 }
 
-export const TOGGLE_COVER = 'TOGGLE_COVER'
-export function toggleCover() {
-  return {
-    type: TOGGLE_COVER
-  }
-}
+export const toggleCover = (): ToggleCoverAction => ({
+  type: 'TOGGLE_COVER'
+})
 
-export const UPDATE_SEARCH_QUERY = 'UPDATE_SEARCH_QUERY'
-export function updateSearchQuery(searchQuery) {
-  return {
-    type: UPDATE_SEARCH_QUERY,
-    searchQuery
-  }
+export type UpdateSearchQueryAction = {
+  type: 'UPDATE_SEARCH_QUERY'
+  searchQuery: string
 }
+export const updateSearchQuery = (
+  searchQuery: string
+): UpdateSearchQueryAction => ({
+  type: 'UPDATE_SEARCH_QUERY',
+  searchQuery
+})
 
 // ERRORS
 
-export const FETCH_SOURCE_ERROR = 'FETCH_SOURCE_ERROR'
-export function fetchSourceError(msg) {
-  return {
-    type: FETCH_SOURCE_ERROR,
-    msg
-  }
+export type ToggleSatelliteViewAction = {
+  type: 'TOGGLE_SATELLITE_VIEW'
 }
 
-export const TOGGLE_SATELLITE_VIEW = 'TOGGLE_SATELLITE_VIEW'
-export function toggleSatelliteView() {
-  return {
-    type: TOGGLE_SATELLITE_VIEW
-  }
-}
+export const toggleSatelliteView = (): ToggleSatelliteViewAction => ({
+  type: 'TOGGLE_SATELLITE_VIEW'
+})
 
 export type ActionTypes =
   | ToggleFetchingDomainAction
   | UpdateHighlightedAction
   | FetchErrorAction
   | UpdateTicksAction
+  | ToggleLanguageAction
+  | ToggleSatelliteViewAction
+  | UpdateSearchQueryAction
+  | ToggleCoverAction
+  | MarkNotificationsReadAction
+  | ToggleNotificationsAction
+  | ToggleIntroPopupAction
+  | ToggleInfoPopupAction
+  | CloseToolbarAction
+  | ToggleSitesAction
+  | SetLoadingAction
+  | UpdateSourceAction
+  | UpdateNarrativeStepIdxAction
+  | UpdateDimensionsAction
+  | UpdateSelectedAction
+  | ClearFilterAction
+  | SetLoadingAction
+  | SetNotLoadingAction
+  | UpdateTimeRangeAction
+  | UpdateNarrativeStepIdxAction
+  | SetInitialShapesAction
+  | ToggleShapesAction
