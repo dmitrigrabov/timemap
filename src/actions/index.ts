@@ -19,7 +19,9 @@ import {
   Shape,
   Associations,
   Narative,
-  ColoringSet
+  ColoringSet,
+  DomainState,
+  DomainExternal
 } from 'store/types'
 
 // TODO: relegate these URLs entirely to environment variables
@@ -35,7 +37,7 @@ const domainMsg = (domainType: string) => {
   return `Something went wrong fetching ${domainType}. Check the URL or try disabling them in the config file.`
 }
 
-export function fetchDomain() {
+export const fetchDomain = (): Promise<DomainState> => {
   const notifications: Notification[] = []
 
   function handleError(message: string) {
@@ -126,7 +128,7 @@ export function fetchDomain() {
       shapesPromise
     ])
       .then(response => {
-        const result = {
+        const result: DomainState = {
           events: response[0],
           associations: response[1],
           sources: response[2],
@@ -135,6 +137,7 @@ export function fetchDomain() {
           shapes: response[5],
           notifications
         }
+
         if (
           Object.values(result).some(resp =>
             Object.prototype.hasOwnProperty.call(resp, 'error')
@@ -168,7 +171,12 @@ export const fetchError = (message: string): FetchErrorAction => ({
   message
 })
 
-export function updateDomain(payload) {
+export type UpdateDomainAction = {
+  type: 'UPDATE_DOMAIN'
+  payload: DomainExternal
+}
+
+export const updateDomain = (payload: DomainExternal) => {
   return {
     type: 'UPDATE_DOMAIN',
     payload
@@ -464,6 +472,7 @@ export type ActionTypes =
   | ToggleSitesAction
   | UpdateColoringSetAction
   | UpdateDimensionsAction
+  | UpdateDomainAction
   | UpdateHighlightedAction
   | UpdateNarativeAction
   | UpdateNarrativeStepIdxAction

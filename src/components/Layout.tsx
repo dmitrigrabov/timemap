@@ -24,7 +24,7 @@ import { binarySearch, insetSourceFrom } from 'common/utilities'
 import { isMobileOnly } from 'react-device-detect'
 
 import { Component } from 'react'
-import { StoreState } from 'store/types'
+import { DomainExternal, StoreState } from 'store/types'
 
 class Dashboard extends Component<StoreState> {
   constructor(props: StoreState) {
@@ -43,7 +43,7 @@ class Dashboard extends Component<StoreState> {
 
   componentDidMount() {
     if (!this.props.app.isMobile) {
-      this.props.actions.fetchDomain().then(domain =>
+      this.props.actions.fetchDomain().then((domain: DomainExternal) =>
         this.props.actions.updateDomain({
           domain,
           features: this.props.features

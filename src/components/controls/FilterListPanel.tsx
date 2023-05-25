@@ -29,6 +29,11 @@ type FilterListPanelProps = {
   filters: FilterAssociation[]
   coloringSet: ColoringSet
   language: Language
+  activeFilters: string[]
+  onSelectFilter: (key: string, matchingKeys: string[]) => void
+  title: string
+  description: string
+  filterColors: string[]
 }
 
 const FilterListPanel: FC<FilterListPanelProps> = ({

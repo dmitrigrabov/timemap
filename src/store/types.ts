@@ -132,8 +132,9 @@ export type Map = {
 }
 
 export type Notification = {
-  message: string
   type: 'error'
+  message: string
+  isRead?: boolean
 }
 
 export type Language = 'en-US' | 'es-MX'
@@ -186,7 +187,7 @@ export type Source = {
   notes: string
 }
 
-export type Event = {
+export type EventExternal = {
   id: string
   description: string
   date: string
@@ -213,7 +214,7 @@ export type Event = {
   colour: string
 }
 
-export type EventEnriched = {
+export type Event = {
   id: number
   description: string
   date: string
@@ -241,6 +242,17 @@ export type EventEnriched = {
   colour: string
 }
 
+export type DomainExternal = {
+  events: EventExternal[]
+  categories: unknown[]
+  associations: Associations[]
+  sources: unknown
+  sites: Site[]
+  shapes: unknown[]
+  regions: unknown[]
+  notifications: Notification[]
+}
+
 export type Site = {
   id: string
   description: string
@@ -258,7 +270,7 @@ export type DomainState = {
   sites: Site[]
   shapes: unknown[]
   regions: unknown[]
-  notifications: unknown[]
+  notifications: Notification[]
 }
 
 export type Titles = {

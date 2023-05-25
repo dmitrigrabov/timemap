@@ -53,7 +53,7 @@ class Toolbar extends Component<ToolbarProps> {
     this.setState({ _selected })
   }
 
-  onSelectFilter(key: string, matchingKeys) {
+  onSelectFilter(key: string, matchingKeys: string[]) {
     const { filters, activeFilters, coloringSet, maxNumOfColors } = this.props
 
     const parent = getImmediateFilterParent(key)
@@ -76,8 +76,8 @@ class Toolbar extends Component<ToolbarProps> {
         }
 
         if (siblingsOff) {
-          const grandparentsOn = getFilterAncestors(key).filter(filt =>
-            activeFilters.includes(filt)
+          const grandparentsOn = getFilterAncestors(key).filter(filter =>
+            activeFilters.includes(filter)
           )
           matchingKeys = matchingKeys.concat(grandparentsOn)
         }
@@ -167,7 +167,9 @@ class Toolbar extends Component<ToolbarProps> {
         <FilterListPanel
           filters={this.props.filters}
           activeFilters={this.props.activeFilters}
-          onSelectFilter={this.onSelectFilter}
+          onSelectFilter={(key: string, matchingKeys: string[]) => {
+            this.onSelectFilter(key, matchingKeys)
+          }}
           language={this.props.language}
           coloringSet={this.props.coloringSet}
           filterColors={this.props.filterColors}
