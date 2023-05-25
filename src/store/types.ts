@@ -37,6 +37,12 @@ export type Views = {
 
 export type AssociationMode = 'CATEGORY' | 'NARRATIVE' | 'FILTER'
 
+export type Media = {
+  src: string
+  title: null
+  type: string
+}
+
 export type Association = {
   id: string
   title: string
@@ -67,10 +73,11 @@ export type Narative = {
   description: string
   withLines: boolean
   steps: Event[]
+  current: number
 }
 
 export type AssociationsObject = {
-  coloringSet: unknown[]
+  coloringSet: string[][]
   filters: FilterAssociation[]
   narrative: Narative
   categories: CategoryAssociation[]
@@ -327,5 +334,96 @@ export type StoreState = {
   ui: UiState
   features: FeaturesState
 }
+
+export type ColoringSet = string[][]
+
+export type ContentKind = 'date' | 'text' | 'line-break' | 'text' | 'media'
+
+export type ContentLink = {
+  text: string
+  href: string
+}
+
+export type ContentField =
+  | ContentFieldDate
+  | ContentFieldText
+  | ContentFieldLineBreak
+  | ContentFieldMedia
+  | ContentFieldLine
+  | ContentFieldItem
+  | ContentFieldMarkdown
+  | ContentFieldTag
+  | ContentFieldButton
+  | ContentFieldLinks
+  | ContentFieldList
+
+export type ContentFieldList = {
+  kind: 'list'
+  title: string
+  value: {
+    title: string
+    value: string
+  }[]
+}
+
+export type ContentFieldLinks = {
+  kind: 'links'
+  title: string
+  value: ContentLink[]
+}
+
+export type ContentFieldButton = {
+  kind: 'button'
+  title: string
+  value: unknown[]
+}
+
+export type ContentFieldTag = {
+  kind: 'tag'
+  align: 'start' | 'end'
+  value: string
+}
+
+export type ContentFieldMarkdown = {
+  kind: 'markdown'
+  title: string
+  value: string
+}
+
+export type ContentFieldItem = {
+  kind: 'item'
+}
+
+export type ContentFieldLine = {
+  kind: 'line'
+}
+
+export type ContentFieldDate = {
+  kind: 'date'
+  title: string
+  value: Date | string
+}
+
+export type ContentFieldText = {
+  kind: 'text'
+  title: string
+  value: string
+  scaleFont?: number
+}
+
+export type ContentFieldLineBreak = {
+  kind: 'line-break'
+  times: number
+}
+
+export type ContentFieldMedia = {
+  kind: 'media'
+  title: string
+  value: Media[]
+}
+
+export type ContentRow = ContentField[]
+
+export type Content = ContentRow[]
 
 export type GetState = () => StoreState

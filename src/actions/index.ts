@@ -18,7 +18,8 @@ import {
   Notification,
   Shape,
   Associations,
-  Narative
+  Narative,
+  ColoringSet
 } from 'store/types'
 
 // TODO: relegate these URLs entirely to environment variables
@@ -324,13 +325,15 @@ export const updateSource = (source: Source): UpdateSourceAction => ({
   source
 })
 
-export const UPDATE_COLORING_SET = 'UPDATE_COLORING_SET'
-export function updateColoringSet(coloringSet) {
-  return {
-    type: UPDATE_COLORING_SET,
-    coloringSet
-  }
+export type UpdateColoringSetAction = {
+  type: 'UPDATE_COLORING_SET'
+  coloringSet: ColoringSet
 }
+
+export const updateColoringSet = (coloringSet: ColoringSet) => ({
+  type: 'UPDATE_COLORING_SET',
+  coloringSet
+})
 
 export type UpdateTicksAction = {
   type: 'UPDATE_TICKS'
@@ -459,6 +462,7 @@ export type ActionTypes =
   | ToggleSatelliteViewAction
   | ToggleShapesAction
   | ToggleSitesAction
+  | UpdateColoringSetAction
   | UpdateDimensionsAction
   | UpdateHighlightedAction
   | UpdateNarativeAction

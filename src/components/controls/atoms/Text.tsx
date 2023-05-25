@@ -1,6 +1,12 @@
-import React, { useState } from 'react'
+import { FC, useState } from 'react'
 
-const CardText = ({ title, value, hoverValue = null }) => {
+type CardTextProps = {
+  title: string
+  value: string
+  hoverValue?: string | null
+}
+
+const CardText: FC<CardTextProps> = ({ title, value, hoverValue = null }) => {
   const [showHover, setShowHover] = useState(false)
 
   return (

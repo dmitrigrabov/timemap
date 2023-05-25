@@ -8,37 +8,30 @@ type BottomActionsProps = {
   features: FeaturesState
 }
 
-const BottomActions: FC<BottomActionsProps> = props => {
-  function renderToggles() {
-    return (
-      <>
-        <div className="bottom-action-block">
-          {props.features.USE_SITES ? (
-            <SitesIcon
-              isActive={props.sites.enabled}
-              onClickHandler={props.sites.toggle}
-            />
-          ) : null}
-        </div>
-        ,
-        <div className="botttom-action-block">
-          <InfoIcon
-            isActive={props.info.enabled}
-            onClickHandler={props.info.toggle}
-          />
-        </div>
-        ,
-        <div className="botttom-action-block">
-          {props.features.USE_COVER ? (
-            <CoverIcon onClickHandler={props.cover.toggle} />
-          ) : null}
-        </div>
-        ,
-      </>
-    )
-  }
-
-  return <div className="bottom-actions">{renderToggles()}</div>
-}
+const BottomActions: FC<BottomActionsProps> = props => (
+  <div className="bottom-actions">
+    <div className="bottom-action-block">
+      {props.features.USE_SITES ? (
+        <SitesIcon
+          isActive={props.sites.enabled}
+          onClickHandler={props.sites.toggle}
+        />
+      ) : null}
+    </div>
+    ,
+    <div className="botttom-action-block">
+      <InfoIcon
+        isActive={props.info.enabled}
+        onClickHandler={props.info.toggle}
+      />
+    </div>
+    ,
+    <div className="botttom-action-block">
+      {props.features.USE_COVER ? (
+        <CoverIcon onClickHandler={props.cover.toggle} />
+      ) : null}
+    </div>
+  </div>
+)
 
 export default BottomActions

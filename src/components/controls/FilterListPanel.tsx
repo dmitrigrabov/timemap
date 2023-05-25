@@ -6,7 +6,7 @@ import {
   getPathLeaf
 } from 'common/utilities'
 import { FC } from 'react'
-import { FilterAssociation } from 'store/types'
+import { ColoringSet, FilterAssociation, Language } from 'store/types'
 
 /** recursively get an array of node keys to toggle */
 function getFiltersToToggle(filter, activeFilters) {
@@ -27,6 +27,8 @@ function getFiltersToToggle(filter, activeFilters) {
 
 type FilterListPanelProps = {
   filters: FilterAssociation[]
+  coloringSet: ColoringSet
+  language: Language
 }
 
 const FilterListPanel: FC<FilterListPanelProps> = ({

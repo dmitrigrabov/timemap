@@ -27,7 +27,8 @@ import {
   StoreState,
   FilterAssociation,
   CategoryAssociation,
-  FeaturesState
+  FeaturesState,
+  ColoringSet
 } from 'store/types'
 import { AppDispatch } from 'store'
 
@@ -35,6 +36,9 @@ type ToolbarProps = {
   filters: FilterAssociation[]
   categories: CategoryAssociation[]
   features: FeaturesState
+  coloringSet: ColoringSet
+  maxNumOfColors: number
+  activeFilters: string[]
 }
 
 class Toolbar extends Component<ToolbarProps> {
@@ -49,7 +53,7 @@ class Toolbar extends Component<ToolbarProps> {
     this.setState({ _selected })
   }
 
-  onSelectFilter(key, matchingKeys) {
+  onSelectFilter(key: string, matchingKeys) {
     const { filters, activeFilters, coloringSet, maxNumOfColors } = this.props
 
     const parent = getImmediateFilterParent(key)

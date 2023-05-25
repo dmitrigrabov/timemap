@@ -1,17 +1,28 @@
-import React from 'react'
+import { Component } from 'react'
 import { marked } from 'marked'
-import Content from './Content'
-import Controls from './Controls'
-import { selectTypeFromPathWithPoster } from '../../common/utilities'
+import Content from 'components/atoms/Content'
+import Controls from 'components/atoms/Controls'
+import { selectTypeFromPathWithPoster } from 'common/utilities'
+import { Source } from 'store/types'
+
+type SourceOverlayProps = {
+  source: Source
+  onCancel: () => void
+}
+
+type SourceOverlayState = {
+  langIdx: number
+  mediaIdx: number
+}
 
 /*
  * Inside the SourceOverlay, both the currently displaying media and language
  * can be changed by the user. These are both managed in this component's React
  * state.
  */
-class SourceOverlay extends React.Component {
-  constructor() {
-    super()
+class SourceOverlay extends Component<SourceOverlayProps, SourceOverlayState> {
+  constructor(props: SourceOverlayProps) {
+    super(props)
     this.state = { mediaIdx: 0, langIdx: 0 }
     this.onShiftGallery = this.onShiftGallery.bind(this)
   }
@@ -28,21 +39,24 @@ class SourceOverlay extends React.Component {
 
   onShiftGallery(shift) {
     // no more left
-    if (this.state.mediaIdx === 0 && shift === -1) return
+    if (this.state.mediaIdx === 0 && shift === -1) {
+      return
+    }
     // no more right
     if (
       this.state.mediaIdx === this.props.source.paths.length - 1 &&
       shift === 1
-    )
+    ) {
       return
+    }
     this.setState({ mediaIdx: this.state.mediaIdx + shift })
   }
 
-  switchLanguage(idx) {
+  switchLanguage(idx: number) {
     this.setState({ langIdx: idx })
   }
 
-  renderContent(source) {
+  renderContent(source: Source) {
     const { url, title, paths, date, type, poster, description } = source
     const shortenedTitle = title.substring(0, 100)
     return (

@@ -16,7 +16,9 @@ import {
   SetInitialShapesAction,
   ToggleShapesAction,
   SetInitialCategoriesAction,
-  ToggleAssociationsAction
+  ToggleAssociationsAction,
+  UpdateColoringSetAction,
+  UpdateNarativeAction
 } from 'actions'
 import { AppState } from 'store/types'
 
@@ -49,17 +51,18 @@ const updateSelected = (
   })
 }
 
-function updateColoringSet(appState, action) {
-  return {
-    ...appState,
-    associations: {
-      ...appState.associations,
-      coloringSet: action.coloringSet
-    }
+const updateColoringSet = (
+  appState: AppState,
+  action: UpdateColoringSetAction
+) => ({
+  ...appState,
+  associations: {
+    ...appState.associations,
+    coloringSet: action.coloringSet
   }
-}
+})
 
-function updateNarrative(appState, action) {
+const updateNarrative = (appState: AppState, action: UpdateNarativeAction) => {
   let minTime = appState.timeline.range[0]
   let maxTime = appState.timeline.range[1]
 

@@ -1,9 +1,20 @@
-import React from 'react'
 import { marked } from 'marked'
+import { CSSProperties, FC, ReactNode } from 'react'
 
 const fontSize = window.innerWidth > 1000 ? 14 : 18
 
-const Popup = ({
+type PopupProps = {
+  content?: unknown[]
+  styles?: CSSProperties
+  isOpen?: boolean
+  onClose?: () => void
+  title?: string
+  theme?: string
+  isMobile?: boolean
+  children?: ReactNode
+}
+
+const Popup: FC<PopupProps> = ({
   content = [],
   styles = {},
   isOpen = true,

@@ -1,11 +1,18 @@
-import CardText from 'components/atoms/Text'
-import CardButton from 'components/atoms/Button'
-import CardCustom from 'components/atoms/CustomField'
-import CardMedia from 'components/atoms/Media'
+import CardText from 'components/controls/atoms/Text'
+import CardButton from 'components/controls/atoms/Button'
+import CardCustom from 'components/controls/atoms/CustomField'
+import CardMedia from 'components/controls/atoms/Media'
 import { makeNiceDate, isEmptyString } from 'common/utilities'
-import CardTime from 'components/atoms/Time'
+import CardTime from 'components/controls/atoms/Time'
+import { FC } from 'react'
+import { ContentField, Language } from 'store/types'
 
-export const CardField = ({ field, language }) => {
+type CardFieldProps = {
+  field: ContentField
+  language: Language
+}
+
+export const CardField: FC<CardFieldProps> = ({ field, language }) => {
   switch (field.kind) {
     case 'media':
       return (
@@ -60,7 +67,7 @@ export const CardField = ({ field, language }) => {
         </div>
       )
     case 'text':
-      return !isEmptyString(field.value) && <CardText {...field} />
+      return !isEmptyString(field.value) ? <CardText {...field} /> : null
     case 'date':
       return (
         <CardTime
@@ -82,22 +89,28 @@ export const CardField = ({ field, language }) => {
           </div>
         </div>
       )
-    case 'list':
+    case 'list': {
       // Only render if some of the list's strings are non-empty
       const shouldFieldRender =
         !!field.value.length &&
         !!field.value.filter(s => !isEmptyString(s)).length
+
       return shouldFieldRender ? (
         // <div className="card-cell">
         <div>
           {field.title && <h4>{field.title}</h4>}
           <div className="card-row m0">
-            {field.value.map((t, idx) => (
-              <CardText key={`card-list-text-${idx}`} value={t} {...t} />
+            {field.value.map(({ title, value }, idx) => (
+              <CardText
+                key={`card-list-text-${idx}`}
+                value={value}
+                title={title}
+              />
             ))}
           </div>
         </div>
       ) : null
+    }
     default:
       return null
   }

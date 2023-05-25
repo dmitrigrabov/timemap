@@ -1,9 +1,21 @@
-import React from 'react'
+import copy from 'common/data/copy.json'
+import { isNotNullNorUndefined } from 'common/utilities'
+import { FC } from 'react'
+import { Language } from 'store/types'
 
-import copy from '../../../common/data/copy.json'
-import { isNotNullNorUndefined } from '../../../common/utilities'
+type CardTimeProps = {
+  title?: string
+  timelabel: string
+  language: Language
+  precision?: string
+}
 
-const CardTime = ({ title = 'Timestamp', timelabel, language, precision }) => {
+const CardTime: FC<CardTimeProps> = ({
+  title = 'Timestamp',
+  timelabel,
+  language,
+  precision
+}) => {
   const unknownLang = copy[language].cardstack.unknown_time
 
   if (isNotNullNorUndefined(timelabel)) {

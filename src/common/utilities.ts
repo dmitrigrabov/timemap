@@ -159,15 +159,18 @@ export function aggregateFilterPaths(filters) {
  *
  * Returns the list of parents: ex. ['Chemical', 'Tear Gas', ...]
  */
-export function getFilterAncestors(filter) {
+export function getFilterAncestors(filter: string) {
   const splitFilter = filter.split('/')
-  const ancestors = []
+
+  const ancestors: string[] = []
+
   splitFilter.forEach((f, index) => {
     const accumulatedPath = splitFilter.slice(0, index + 1).join('/')
     ancestors.push(accumulatedPath)
   })
   // The last element here will be the leaf node aka the filter passed in
   ancestors.pop()
+
   return ancestors
 }
 
@@ -175,7 +178,7 @@ export function getFilterAncestors(filter) {
  * Grabs the second to last element in the paths array for a given existing filter.
  * This is the filter's most immediate ancestor.
  */
-export function getImmediateFilterParent(filter) {
+export function getImmediateFilterParent(filter: string) {
   const ancestors = getFilterAncestors(filter)
   return ancestors[ancestors.length - 1]
 }

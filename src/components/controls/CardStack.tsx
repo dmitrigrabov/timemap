@@ -1,15 +1,25 @@
 import { Component, createRef } from 'react'
 import { connect } from 'react-redux'
 import { generateCardLayout, Card } from 'components/controls/Card'
-
 import * as selectors from 'selectors'
 import { getFilterIdxFromColorSet } from 'common/utilities'
 import copy from 'common/data/copy.json'
 import hash from 'object-hash'
+import { Content, Event, Language, Narative, StoreState } from 'store/types'
 
-class CardStack extends Component {
-  constructor() {
-    super()
+type CardStackProps = {
+  language: Language
+  isCardstack: boolean
+  narrative: Narative
+  selected: Event[]
+  colors: string[]
+  cardUI: unknown
+  isLoading: boolean
+}
+
+class CardStack extends Component<CardStackProps> {
+  constructor(props: CardStackProps) {
+    super(props)
     this.refs = {}
     this.refCardStack = createRef()
     this.refCardStackContent = createRef()
@@ -57,21 +67,19 @@ class CardStack extends Component {
     animateScroll()
   }
 
-  renderCards(events, selections) {
+  renderCards(events: Event[], selections: boolean[]) {
     // if no selections provided, select all
-    if (!selections) {
-      selections = events.map(e => true)
-    }
+
     this.refs = []
 
     const generateTemplate =
       generateCardLayout[this.props.cardUI.layout.template]
 
     return events.map((event, idx) => {
-      const thisRef = React.createRef()
+      const thisRef = createRef()
       this.refs[idx] = thisRef
 
-      const content = generateTemplate({
+      const content: Content = generateTemplate({
         event,
         colors: this.props.colors,
         coloringSet: this.props.coloringSet,
@@ -94,7 +102,10 @@ class CardStack extends Component {
     const { selected } = this.props
 
     if (selected.length > 0) {
-      return this.renderCards(selected)
+      return this.renderCards(
+        selected,
+        selected.map(() => true)
+      )
     }
     return null
   }
@@ -178,7 +189,7 @@ class CardStack extends Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: StoreState) {
   return {
     narrative: selectors.selectActiveNarrative(state),
     selected: selectors.selectSelected(state),

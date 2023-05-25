@@ -2,10 +2,10 @@ import { FC, useState } from 'react'
 import CardCaret from 'components/controls/atoms/Caret'
 import hash from 'object-hash'
 import { CardField } from 'components/controls/CardField'
-import { Event, Language } from 'store/types'
+import { Content, Event, Language } from 'store/types'
 
 export const generateCardLayout = {
-  basic: ({ event }: { event: Event }) => {
+  basic: ({ event }: { event: Event }): Content => {
     return [
       [
         {
@@ -67,7 +67,7 @@ export const generateCardLayout = {
 }
 
 type CardProps = {
-  content: unknown[]
+  content: Content
   isLoading: boolean
   onSelect: () => void
   sources: unknown[]
@@ -77,7 +77,6 @@ type CardProps = {
 
 export const Card: FC<CardProps> = ({
   content = [],
-  isLoading = true,
   onSelect = () => {},
   sources = [],
   isSelected = false,
@@ -111,8 +110,8 @@ export const Card: FC<CardProps> = ({
       ))}
       {isOpen && (
         <div className="card-bottomhalf">
-          {sources.map(() => (
-            <div className="card-row"></div>
+          {sources.map((_, index) => (
+            <div key={index} className="card-row" />
           ))}
         </div>
       )}

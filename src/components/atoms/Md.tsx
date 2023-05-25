@@ -1,9 +1,14 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import { marked } from 'marked'
+import { Component } from 'react'
 
-class Md extends React.Component {
-  constructor(props) {
+type MdProps = {
+  path: string
+  unloader?: JSX.Element
+  loader?: JSX.Element
+}
+
+class Md extends Component<MdProps> {
+  constructor(props: MdProps) {
     super(props)
     this.state = { md: null, error: null }
   }
@@ -37,12 +42,6 @@ class Md extends React.Component {
       return this.props.loader
     }
   }
-}
-
-Md.propTypes = {
-  loader: PropTypes.func,
-  unloader: PropTypes.func.isRequired,
-  path: PropTypes.string.isRequired
 }
 
 export default Md
