@@ -7,21 +7,25 @@ import {
   sitesApiPath,
   sourcesApiPath
 } from 'config'
-import { AppDispatch } from 'store'
+import { validate } from 'lib/validate/validate'
+import { associationsModel } from 'model/association'
+import { shapesModel } from 'model/shape'
+import { AnyAction } from 'redux'
+import { ThunkAction } from 'redux-thunk'
 import {
   Dimensions,
   Event,
-  GetState,
   Language,
   Source,
   TimeRange,
   Notification,
   Shape,
   Associations,
-  Narative,
+  Narrative,
   ColoringSet,
-  DomainState,
-  DomainExternal
+  DomainExternal,
+  StoreState,
+  FeaturesState
 } from 'store/types'
 
 // TODO: relegate these URLs entirely to environment variables
@@ -37,18 +41,62 @@ const domainMsg = (domainType: string) => {
   return `Something went wrong fetching ${domainType}. Check the URL or try disabling them in the config file.`
 }
 
-export const fetchDomain = (): Promise<DomainState> => {
-  const notifications: Notification[] = []
+const createError = (message: string): Notification => ({
+  type: 'error',
+  message
+})
 
-  function handleError(message: string) {
-    notifications.push({
-      message,
-      type: 'error'
+type HandleResponseArgs = {
+  inUse?: boolean
+  domainType: string
+  urls: string | string[]
+}
+
+type HandleResponseOutput = {
+  notification?: Notification
+  data: unknown[]
+}
+
+const handleResponse = ({
+  domainType,
+  urls,
+  inUse
+}: HandleResponseArgs): Promise<HandleResponseOutput> => {
+  const empty: unknown[] = []
+
+  if (!inUse) {
+    return Promise.resolve({
+      data: empty
     })
-    return []
   }
 
-  return (dispatch: AppDispatch, getState: GetState) => {
+  if (!urls.length) {
+    return Promise.resolve({
+      data: empty,
+      notification: createError(
+        'USE_ASSOCIATIONS is true, but you have not provided a ASSOCIATIONS_EXT'
+      )
+    })
+  }
+
+  return fetch([urls].join(''))
+    .then(response => response.json())
+    .then(data => ({
+      data
+    }))
+    .catch(() => ({
+      notification: createError(domainMsg(domainType)),
+      data: empty
+    }))
+}
+
+const fetchDomain = (): ThunkAction<
+  Promise<DomainExternal | undefined>,
+  StoreState,
+  unknown,
+  AnyAction
+> => {
+  return (dispatch, getState) => {
     const features = getState().features
     dispatch(toggleFetchingDomain())
 
@@ -64,60 +112,42 @@ export const fetchDomain = (): Promise<DomainState> => {
       eventsUrls.map(url =>
         fetch(url)
           .then(response => response.json())
-          .catch(() => handleError('events'))
+          .catch((): unknown[] => {
+            // handleError('events')
+            return []
+          })
       )
-    ).then(results => results.flatMap(t => t))
+    ).then((results: unknown[]) => results.flatMap(t => t))
 
-    let associationsPromise = Promise.resolve([])
-    if (features.USE_ASSOCIATIONS) {
-      if (!associationsUrls.length) {
-        associationsPromise = Promise.resolve(
-          handleError(
-            'USE_ASSOCIATIONS is true, but you have not provided a ASSOCIATIONS_EXT'
-          )
-        )
-      } else {
-        associationsPromise = fetch([associationsUrls].join(''))
-          .then(response => response.json())
-          .catch(() => handleError(domainMsg('associations')))
-      }
-    }
+    const associationsPromise = handleResponse({
+      domainType: 'associations',
+      urls: associationsUrls,
+      inUse: features.USE_ASSOCIATIONS
+    })
 
-    let sourcesPromise = Promise.resolve([])
-    if (features.USE_SOURCES) {
-      if (!sourcesUrl) {
-        sourcesPromise = Promise.resolve(
-          handleError(
-            'USE_SOURCES is true, but you have not provided a SOURCES_EXT'
-          )
-        )
-      } else {
-        sourcesPromise = fetch([sourcesUrl].join(''))
-          .then(response => response.json())
-          .catch(() => handleError(domainMsg('sources')))
-      }
-    }
+    const sourcesPromise = handleResponse({
+      domainType: 'sources',
+      urls: sourcesUrl,
+      inUse: features.USE_SOURCES
+    })
 
-    let sitesPromise = Promise.resolve([])
-    if (features.USE_SITES) {
-      sitesPromise = fetch([sitesUrl].join(''))
-        .then(response => response.json())
-        .catch(() => handleError(domainMsg('sites')))
-    }
+    const sitesPromise = handleResponse({
+      domainType: 'sites',
+      urls: sitesUrl,
+      inUse: features.USE_SITES
+    })
 
-    let regionsPromise = Promise.resolve([])
-    if (features.USE_REGIONS) {
-      regionsPromise = fetch([regionsUrl].join(''))
-        .then(response => response.json())
-        .catch(() => handleError(domainMsg('regions')))
-    }
+    const regionsPromise = handleResponse({
+      domainType: 'regions',
+      urls: regionsUrl,
+      inUse: features.USE_REGIONS
+    })
 
-    let shapesPromise = Promise.resolve([])
-    if (features.USE_SHAPES) {
-      shapesPromise = fetch([shapesUrl].join(''))
-        .then(response => response.json())
-        .catch(() => handleError(domainMsg('shapes')))
-    }
+    const shapesPromise = handleResponse({
+      domainType: 'shapes',
+      urls: shapesUrl,
+      inUse: features.USE_SHAPES
+    })
 
     return Promise.all([
       eventPromise,
@@ -127,36 +157,59 @@ export const fetchDomain = (): Promise<DomainState> => {
       regionsPromise,
       shapesPromise
     ])
-      .then(response => {
-        const result: DomainState = {
-          events: response[0],
-          associations: response[1],
-          sources: response[2],
-          sites: response[3],
-          regions: response[4],
-          shapes: response[5],
+      .then(res => {
+        const [events, associations, sources, sites, regions, shapes] = res
+        const notifications = [
+          associations,
+          sources,
+          sites,
+          regions,
+          shapes
+        ].reduce<Notification[]>((acc, { notification }) => {
+          if (notification) {
+            acc.push(notification)
+          }
+          return acc
+        }, [])
+
+        const result: DomainExternal = {
+          events,
+          associations: associations.data,
+          sources: sources.data,
+          sites: sites.data,
+          regions: regions.data,
+          shapes: shapes.data,
           notifications
         }
 
-        if (
-          Object.values(result).some(resp =>
-            Object.prototype.hasOwnProperty.call(resp, 'error')
-          )
-        ) {
-          throw new Error(
-            'Some URLs returned negative. If you are in development, check the server is running'
-          )
-        }
+        // if (
+        //   Object.values(result).some(resp =>
+        //     Object.prototype.hasOwnProperty.call(resp, 'error')
+        //   )
+        // ) {
+        //   throw new Error(
+        //     'Some URLs returned negative. If you are in development, check the server is running'
+        //   )
+        // }
+
+        const parsedAssociations =
+          validate(associations.data, associationsModel) ?? []
+
+        const parsedShapes = validate(shapes.data, shapesModel) ?? []
+
         dispatch(toggleFetchingDomain())
-        dispatch(setInitialCategories(associations))
-        dispatch(setInitialShapes(shapes))
+        dispatch(setInitialCategories(parsedAssociations))
+        dispatch(setInitialShapes(parsedShapes))
+
         return result
       })
       .catch(err => {
-        dispatch(fetchError(err.message))
+        dispatch(fetchError('Failed to fetch'))
         dispatch(toggleFetchingDomain())
-        // TODO: handle this appropriately in React hierarchy
+
         alert(err.message)
+
+        return undefined
       })
   }
 }
@@ -166,17 +219,22 @@ export type FetchErrorAction = {
   message: string
 }
 
-export const fetchError = (message: string): FetchErrorAction => ({
+const fetchError = (message: string): FetchErrorAction => ({
   type: 'FETCH_ERROR',
   message
 })
 
 export type UpdateDomainAction = {
   type: 'UPDATE_DOMAIN'
-  payload: DomainExternal
+  payload: UpdateDomainPayload
 }
 
-export const updateDomain = (payload: DomainExternal) => {
+type UpdateDomainPayload = {
+  domain: DomainExternal | undefined
+  features: FeaturesState
+}
+
+const updateDomain = (payload: UpdateDomainPayload): UpdateDomainAction => {
   return {
     type: 'UPDATE_DOMAIN',
     payload
@@ -188,9 +246,7 @@ export type UpdateHighlightedAction = {
   highlighted: boolean
 }
 
-export const updateHighlighted = (
-  highlighted: boolean
-): UpdateHighlightedAction => ({
+const updateHighlighted = (highlighted: boolean): UpdateHighlightedAction => ({
   type: 'UPDATE_HIGHLIGHTED',
   highlighted
 })
@@ -200,7 +256,7 @@ export type UpdateSelectedAction = {
   selected: Event[]
 }
 
-export const updateSelected = (selected: Event[]): UpdateSelectedAction => ({
+const updateSelected = (selected: Event[]): UpdateSelectedAction => ({
   type: 'UPDATE_SELECTED',
   selected: selected
 })
@@ -210,7 +266,7 @@ export type ClearFilterAction = {
   filter: string
 }
 
-export const clearFilter = (filter: string): ClearFilterAction => ({
+const clearFilter = (filter: string): ClearFilterAction => ({
   type: 'CLEAR_FILTER',
   filter
 })
@@ -222,7 +278,7 @@ export type ToggleAssociationsAction = {
   shouldColor?: boolean
 }
 
-export const toggleAssociations = (
+const toggleAssociations = (
   association: 'filters' | 'categories',
   value: Associations | Associations[],
   shouldColor?: boolean
@@ -237,7 +293,7 @@ export type ToggleShapesAction = {
   type: 'TOGGLE_SHAPES'
   shape: string
 }
-export const toggleShapes = (shape: string) => ({
+const toggleShapes = (shape: string) => ({
   type: 'TOGGLE_SHAPES',
   shape
 })
@@ -246,7 +302,7 @@ export type SetLoadingAction = {
   type: 'SET_LOADING'
 }
 
-export const setLoading = (): SetLoadingAction => ({
+const setLoading = (): SetLoadingAction => ({
   type: 'SET_LOADING'
 })
 
@@ -254,7 +310,7 @@ export type SetNotLoadingAction = {
   type: 'SET_NOT_LOADING'
 }
 
-export const setNotLoading = (): SetNotLoadingAction => ({
+const setNotLoading = (): SetNotLoadingAction => ({
   type: 'SET_NOT_LOADING'
 })
 
@@ -263,7 +319,9 @@ export type SetInitialCategoriesAction = {
   values: Associations[]
 }
 
-export const setInitialCategories = (values: Associations[]) => ({
+const setInitialCategories = (
+  values: Associations[]
+): SetInitialCategoriesAction => ({
   type: 'SET_INITIAL_CATEGORIES',
   values
 })
@@ -273,7 +331,7 @@ export type SetInitialShapesAction = {
   values: Shape[]
 }
 
-export const setInitialShapes = (values: Shape[]): SetInitialShapesAction => ({
+const setInitialShapes = (values: Shape[]): SetInitialShapesAction => ({
   type: 'SET_INITIAL_SHAPES',
   values
 })
@@ -282,9 +340,7 @@ export type UpdateTimeRangeAction = {
   timerange: TimeRange
 }
 
-export const updateTimeRange = (
-  timerange: TimeRange
-): UpdateTimeRangeAction => ({
+const updateTimeRange = (timerange: TimeRange): UpdateTimeRangeAction => ({
   type: 'UPDATE_TIMERANGE',
   timerange
 })
@@ -294,17 +350,17 @@ export type UpdateDimensionsAction = {
   dims: Dimensions
 }
 
-export const updateDimensions = (dims: Dimensions): UpdateDimensionsAction => ({
+const updateDimensions = (dims: Dimensions): UpdateDimensionsAction => ({
   type: 'UPDATE_DIMENSIONS',
   dims
 })
 
-export type UpdateNarativeAction = {
+export type UpdateNarrativeAction = {
   type: 'UPDATE_NARRATIVE'
-  narrative: Narative
+  narrative: Narrative
 }
 
-export const updateNarrative = (narrative: Narative): UpdateNarativeAction => {
+const updateNarrative = (narrative: Narrative): UpdateNarrativeAction => {
   return {
     type: 'UPDATE_NARRATIVE',
     narrative
@@ -316,9 +372,7 @@ export type UpdateNarrativeStepIdxAction = {
   idx: number
 }
 
-export const updateNarrativeStepIdx = (
-  idx: number
-): UpdateNarrativeStepIdxAction => ({
+const updateNarrativeStepIdx = (idx: number): UpdateNarrativeStepIdxAction => ({
   type: 'UPDATE_NARRATIVE_STEP_IDX',
   idx
 })
@@ -328,7 +382,7 @@ export type UpdateSourceAction = {
   source: Source
 }
 
-export const updateSource = (source: Source): UpdateSourceAction => ({
+const updateSource = (source: Source): UpdateSourceAction => ({
   type: 'UPDATE_SOURCE',
   source
 })
@@ -338,7 +392,7 @@ export type UpdateColoringSetAction = {
   coloringSet: ColoringSet
 }
 
-export const updateColoringSet = (coloringSet: ColoringSet) => ({
+const updateColoringSet = (coloringSet: ColoringSet) => ({
   type: 'UPDATE_COLORING_SET',
   coloringSet
 })
@@ -348,7 +402,7 @@ export type UpdateTicksAction = {
   ticks: number
 }
 
-export const updateTicks = (ticks: number): UpdateTicksAction => ({
+const updateTicks = (ticks: number): UpdateTicksAction => ({
   type: 'UPDATE_TICKS',
   ticks
 })
@@ -358,7 +412,7 @@ export const updateTicks = (ticks: number): UpdateTicksAction => ({
 export type ToggleSitesAction = {
   type: 'TOGGLE_SITES'
 }
-export const toggleSites = (): ToggleSitesAction => ({
+const toggleSites = (): ToggleSitesAction => ({
   type: 'TOGGLE_SITES'
 })
 
@@ -366,7 +420,7 @@ export type ToggleFetchingDomainAction = {
   type: 'TOGGLE_FETCHING_DOMAIN'
 }
 
-export const toggleFetchingDomain = (): ToggleFetchingDomainAction => ({
+const toggleFetchingDomain = (): ToggleFetchingDomainAction => ({
   type: 'TOGGLE_FETCHING_DOMAIN'
 })
 
@@ -375,7 +429,7 @@ export type ToggleLanguageAction = {
   language: Language
 }
 
-export const toggleLanguage = (language: Language): ToggleLanguageAction => ({
+const toggleLanguage = (language: Language): ToggleLanguageAction => ({
   type: 'TOGGLE_LANGUAGE',
   language
 })
@@ -384,7 +438,7 @@ export type CloseToolbarAction = {
   type: 'CLOSE_TOOLBAR'
 }
 
-export const closeToolbar = (): CloseToolbarAction => ({
+const closeToolbar = (): CloseToolbarAction => ({
   type: 'CLOSE_TOOLBAR'
 })
 
@@ -392,7 +446,7 @@ export type ToggleInfoPopupAction = {
   type: 'TOGGLE_INFOPOPUP'
 }
 
-export const toggleInfoPopup = (): ToggleInfoPopupAction => ({
+const toggleInfoPopup = (): ToggleInfoPopupAction => ({
   type: 'TOGGLE_INFOPOPUP'
 })
 
@@ -400,7 +454,7 @@ export type ToggleIntroPopupAction = {
   type: 'TOGGLE_INTROPOPUP'
 }
 
-export const toggleIntroPopup = (): ToggleIntroPopupAction => ({
+const toggleIntroPopup = (): ToggleIntroPopupAction => ({
   type: 'TOGGLE_INTROPOPUP'
 })
 
@@ -408,7 +462,7 @@ export type ToggleNotificationsAction = {
   type: 'TOGGLE_NOTIFICATIONS'
 }
 
-export const toggleNotifications = (): ToggleNotificationsAction => ({
+const toggleNotifications = (): ToggleNotificationsAction => ({
   type: 'TOGGLE_NOTIFICATIONS'
 })
 
@@ -416,7 +470,7 @@ export type MarkNotificationsReadAction = {
   type: 'MARK_NOTIFICATIONS_READ'
 }
 
-export const markNotificationsRead = (): MarkNotificationsReadAction => ({
+const markNotificationsRead = (): MarkNotificationsReadAction => ({
   type: 'MARK_NOTIFICATIONS_READ'
 })
 
@@ -424,7 +478,7 @@ export type ToggleCoverAction = {
   type: 'TOGGLE_COVER'
 }
 
-export const toggleCover = (): ToggleCoverAction => ({
+const toggleCover = (): ToggleCoverAction => ({
   type: 'TOGGLE_COVER'
 })
 
@@ -432,9 +486,7 @@ export type UpdateSearchQueryAction = {
   type: 'UPDATE_SEARCH_QUERY'
   searchQuery: string
 }
-export const updateSearchQuery = (
-  searchQuery: string
-): UpdateSearchQueryAction => ({
+const updateSearchQuery = (searchQuery: string): UpdateSearchQueryAction => ({
   type: 'UPDATE_SEARCH_QUERY',
   searchQuery
 })
@@ -445,9 +497,46 @@ export type ToggleSatelliteViewAction = {
   type: 'TOGGLE_SATELLITE_VIEW'
 }
 
-export const toggleSatelliteView = (): ToggleSatelliteViewAction => ({
+const toggleSatelliteView = (): ToggleSatelliteViewAction => ({
   type: 'TOGGLE_SATELLITE_VIEW'
 })
+
+const actions = {
+  fetchDomain,
+  fetchError,
+  updateDomain,
+  updateHighlighted,
+  updateSelected,
+  clearFilter,
+  toggleAssociations,
+  toggleShapes,
+  setLoading,
+  setNotLoading,
+  setInitialCategories,
+  setInitialShapes,
+  updateTimeRange,
+  updateDimensions,
+  updateNarrative,
+  updateNarrativeStepIdx,
+  updateSource,
+  updateColoringSet,
+  updateTicks,
+  toggleSites,
+  toggleFetchingDomain,
+  toggleLanguage,
+  closeToolbar,
+  toggleInfoPopup,
+  toggleIntroPopup,
+  toggleNotifications,
+  markNotificationsRead,
+  toggleCover,
+  updateSearchQuery,
+  toggleSatelliteView
+}
+
+export default actions
+
+export type Actions = typeof actions
 
 export type ActionTypes =
   | ClearFilterAction
@@ -474,7 +563,7 @@ export type ActionTypes =
   | UpdateDimensionsAction
   | UpdateDomainAction
   | UpdateHighlightedAction
-  | UpdateNarativeAction
+  | UpdateNarrativeAction
   | UpdateNarrativeStepIdxAction
   | UpdateSearchQueryAction
   | UpdateSelectedAction

@@ -1,6 +1,6 @@
 import initial from 'store/initial'
 import { validateDomain } from 'reducers/validate/validators'
-import { DomainExternal, DomainState } from 'store/types'
+import { DomainState } from 'store/types'
 import { ActionTypes, UpdateDomainAction } from 'actions'
 
 function updateDomain(domainState: DomainState, action: UpdateDomainAction) {
@@ -18,7 +18,7 @@ const markNotificationsRead = (domainState: DomainState) => ({
   }))
 })
 
-const initialDomain: DomainExternal = initial.domain
+const initialDomain: DomainState = initial.domain
 
 function domain(domainState = initialDomain, action: ActionTypes) {
   switch (action.type) {

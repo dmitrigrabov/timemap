@@ -56,11 +56,13 @@
     "semver": "7.3.2",
     "styled-components": "^5.3.5",
     "supercluster": "^7.1.5",
-    "video-react": "^0.16.0"
+    "video-react": "^0.16.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@dmitrigrabov/eslint-config": "0.0.1",
     "@types/d3": "^7.4.0",
+    "@types/joi": "^17.2.3",
     "@types/marked": "^5.0.0",
     "@types/object-hash": "^3.0.2",
     "@types/ramda": "^0.29.1",

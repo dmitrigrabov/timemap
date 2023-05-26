@@ -18,7 +18,7 @@ import {
   SetInitialCategoriesAction,
   ToggleAssociationsAction,
   UpdateColoringSetAction,
-  UpdateNarativeAction
+  UpdateNarrativeAction
 } from 'actions'
 import { AppState } from 'store/types'
 
@@ -62,7 +62,7 @@ const updateColoringSet = (
   }
 })
 
-const updateNarrative = (appState: AppState, action: UpdateNarativeAction) => {
+const updateNarrative = (appState: AppState, action: UpdateNarrativeAction) => {
   let minTime = appState.timeline.range[0]
   let maxTime = appState.timeline.range[1]
 

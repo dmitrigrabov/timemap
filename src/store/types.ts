@@ -67,7 +67,7 @@ export type Associations =
   | NarrativeAssociation
   | CategoryAssociation
 
-export type Narative = {
+export type Narrative = {
   id: string
   label: string
   description: string
@@ -79,7 +79,7 @@ export type Narative = {
 export type AssociationsObject = {
   coloringSet: string[][]
   filters: FilterAssociation[]
-  narrative: Narative
+  narrative: Narrative
   categories: CategoryAssociation[]
   views: Views
 }
@@ -167,6 +167,7 @@ export type AppState = {
   map?: Map
   searchQuery?: string
   filters: Record<string, unknown[]>
+  intro: string[]
   narrativeState: {
     current: number
   }
@@ -185,33 +186,6 @@ export type Source = {
   author: string
   date: string
   notes: string
-}
-
-export type EventExternal = {
-  id: string
-  description: string
-  date: string
-  time: string
-  time_precision: string
-  location: string
-  latitude: string
-  longitude: string
-
-  x: string
-  y: string
-  z: string
-
-  type: string
-  category: string
-  category_full: string
-  associations: string[]
-  sources: Source[]
-  comments: string
-  time_display: string
-
-  narrative__stepStyles: unknown[]
-  shape: string
-  colour: string
 }
 
 export type Event = {
@@ -238,16 +212,43 @@ export type Event = {
   time_display: string
 
   narrative__stepStyles: unknown[]
-  shape: string
+  shape: Shape | undefined
+  colour: string
+}
+
+export type EventPostValidation = {
+  id: number
+  description: string
+  date: string
+  time: string
+  datetime: Date
+  time_precision: string
+  location: string
+  latitude: string
+  longitude: string
+
+  x: string
+  y: string
+  z: string
+
+  type: string
+  category: string
+  category_full: string
+  associations: Associations[]
+  sources: string[]
+  comments: string
+  time_display: string
+
+  narrative__stepStyles: unknown[]
+  shape: Shape | undefined
   colour: string
 }
 
 export type DomainExternal = {
-  events: EventExternal[]
-  categories: unknown[]
-  associations: Associations[]
+  events: unknown[]
+  associations: unknown[]
   sources: unknown
-  sites: Site[]
+  sites: unknown[]
   shapes: unknown[]
   regions: unknown[]
   notifications: Notification[]
@@ -338,6 +339,7 @@ export type FeaturesState = {
   GRAPH_NONLOCATED: GraphNonLocated
   HIGHLIGHT_GROUPS: boolean
   USE_SHAPES: boolean
+  CUSTOM_EVENT_FIELDS: unknown[]
 }
 
 export type StoreState = {

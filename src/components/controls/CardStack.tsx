@@ -5,12 +5,12 @@ import * as selectors from 'selectors'
 import { getFilterIdxFromColorSet } from 'common/utilities'
 import copy from 'common/data/copy.json'
 import hash from 'object-hash'
-import { Content, Event, Language, Narative, StoreState } from 'store/types'
+import { Content, Event, Language, Narrative, StoreState } from 'store/types'
 
 type CardStackProps = {
   language: Language
   isCardstack: boolean
-  narrative: Narative
+  narrative: Narrative
   selected: Event[]
   colors: string[]
   cardUI: unknown

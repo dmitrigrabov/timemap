@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as actions from 'actions'
+import { default as actions, ToggleCoverAction } from 'actions'
 import * as selectors from 'selectors'
 
 import { Tabs, TabList, TabPanel } from 'react-tabs'
@@ -28,17 +28,32 @@ import {
   FilterAssociation,
   CategoryAssociation,
   FeaturesState,
-  ColoringSet
+  ColoringSet,
+  Associations,
+  Narrative
 } from 'store/types'
 import { AppDispatch } from 'store'
 
+type ToolbarMethods = {
+  onTitle: () => ToggleCoverAction
+  onSelectFilter: (filters: Associations | Associations[]) => void
+  onCategoryFilter: (categories: Associations | Associations[]) => void
+  onSelectNarrative: (narrative: Narrative) => void
+  onShapeFilter: (shape: string) => {
+    type: string
+    shape: string
+  }
+}
+
 type ToolbarProps = {
+  isNarrative: boolean
   filters: FilterAssociation[]
   categories: CategoryAssociation[]
   features: FeaturesState
   coloringSet: ColoringSet
   maxNumOfColors: number
   activeFilters: string[]
+  methods: ToolbarMethods
 }
 
 class Toolbar extends Component<ToolbarProps> {

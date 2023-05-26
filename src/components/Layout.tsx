@@ -1,6 +1,5 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import * as actions from 'actions'
 import * as selectors from 'selectors'
 
 import Toolbar from 'components/Toolbar'
@@ -20,14 +19,19 @@ import CardStack from 'components/controls/CardStack'
 import NarrativeControls from 'components/controls/NarrativeControls'
 
 import { fallbackEventColor } from 'common/global'
-import { binarySearch, insetSourceFrom } from 'common/utilities'
+import { binarySearch } from 'common/utilities'
 import { isMobileOnly } from 'react-device-detect'
 
 import { Component } from 'react'
-import { DomainExternal, StoreState } from 'store/types'
+import { DomainExternal, StoreState, Narrative } from 'store/types'
+import { Actions, default as actionsObject } from 'actions'
 
-class Dashboard extends Component<StoreState> {
-  constructor(props: StoreState) {
+type DashboardProps = StoreState & {
+  actions: Actions
+}
+
+class Dashboard extends Component<DashboardProps> {
+  constructor(props: DashboardProps) {
     super(props)
 
     this.handleViewSource = this.handleViewSource.bind(this)
@@ -43,12 +47,19 @@ class Dashboard extends Component<StoreState> {
 
   componentDidMount() {
     if (!this.props.app.isMobile) {
-      this.props.actions.fetchDomain().then((domain: DomainExternal) =>
-        this.props.actions.updateDomain({
-          domain,
-          features: this.props.features
+      const fetchDomain = this.props.actions
+        .fetchDomain as unknown as () => Promise<DomainExternal | undefined>
+
+      fetchDomain()
+        .then(domain => {
+          this.props.actions.updateDomain({
+            domain,
+            features: this.props.features
+          })
         })
-      )
+        .catch((err: Error) => {
+          console.error(err)
+        })
     }
     // NOTE: hack to get the timeline to always show. Not entirely sure why
     // this is necessary.
@@ -135,7 +146,7 @@ class Dashboard extends Component<StoreState> {
     }
   }
 
-  setNarrative(narrative) {
+  setNarrative(narrativ: Narrative) {
     // only handleSelect if narrative is not null and has associated events
     if (narrative && narrative.steps.length >= 1) {
       this.handleSelect([narrative.steps[0]])
@@ -143,47 +154,47 @@ class Dashboard extends Component<StoreState> {
     this.props.actions.updateNarrative(narrative)
   }
 
-  setNarrativeFromFilters(withSteps) {
-    const { app, domain } = this.props
-    let activeFilters = app.associations.filters
+  // setNarrativeFromFilters(withSteps) {
+  //   const { app, domain } = this.props
+  //   let activeFilters = app.associations.filters
 
-    if (activeFilters.length === 0) {
-      alert('No filters selected, cant narrativise')
-      return
-    }
+  //   if (activeFilters.length === 0) {
+  //     alert('No filters selected, cant narrativise')
+  //     return
+  //   }
 
-    activeFilters = activeFilters.map(f => ({ name: f }))
+  //   activeFilters = activeFilters.map(f => ({ name: f }))
 
-    const evs = domain.events.filter(ev => {
-      let hasOne = false
-      // add event if it has at least one matching filter
-      for (let i = 0; i < activeFilters.length; i++) {
-        if (ev.associations.includes(activeFilters[i].name)) {
-          hasOne = true
-          break
-        }
-      }
-      if (hasOne) {
-        return true
-      }
-      return false
-    })
+  //   const evs = domain.events.filter(ev => {
+  //     let hasOne = false
+  //     // add event if it has at least one matching filter
+  //     for (let i = 0; i < activeFilters.length; i++) {
+  //       if (ev.associations.includes(activeFilters[i].name)) {
+  //         hasOne = true
+  //         break
+  //       }
+  //     }
+  //     if (hasOne) {
+  //       return true
+  //     }
+  //     return false
+  //   })
 
-    if (evs.length === 0) {
-      alert('No associated events, cant narrativise')
-      return
-    }
+  //   if (evs.length === 0) {
+  //     alert('No associated events, cant narrativise')
+  //     return
+  //   }
 
-    const name = activeFilters.map(f => f.name).join('-')
-    const desc = activeFilters.map(f => f.description).join('\n\n')
-    this.setNarrative({
-      id: name,
-      label: name,
-      description: desc,
-      withLines: withSteps,
-      steps: evs.map(insetSourceFrom(domain.sources))
-    })
-  }
+  //   const name = activeFilters.map(f => f.name).join('-')
+  //   const desc = activeFilters.map(f => f.description).join('\n\n')
+  //   this.setNarrative({
+  //     id: name,
+  //     label: name,
+  //     description: desc,
+  //     withLines: withSteps,
+  //     steps: evs.map(insetSourceFrom(domain.sources))
+  //   })
+  // }
 
   selectNarrativeStep(idx: number) {
     // Try to find idx if event passed rather than number
@@ -348,7 +359,9 @@ class Dashboard extends Component<StoreState> {
             onCategoryFilter: categories =>
               actions.toggleAssociations('categories', categories),
             onShapeFilter: actions.toggleShapes,
-            onSelectNarrative: this.setNarrative
+            onSelectNarrative: (narrative: Narrative) => {
+              this.setNarrative(narrative)
+            }
           }}
         />
         <Space
@@ -449,12 +462,12 @@ class Dashboard extends Component<StoreState> {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(actions, dispatch)
+    actions: bindActionCreators(actionsObject, dispatch)
   }
 }
 
 export default connect(
-  state => ({
+  (state: StoreState) => ({
     ...state,
     narrativeIdx: selectors.selectNarrativeIdx(state),
     narratives: selectors.selectNarratives(state),
