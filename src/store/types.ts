@@ -293,7 +293,7 @@ export type Narratives = {
 }
 
 export type Style = {
-  categories: {
+  categories: Record<string, string> & {
     default: string
   }
   narratives: {
@@ -340,6 +340,7 @@ export type GraphNonLocated = {
 export type FeaturesState = {
   USE_COVER: boolean
   USE_ASSOCIATIONS: boolean
+  USE_CATEGORIES: boolean
   USE_SITES: boolean
   USE_SOURCES: boolean
   USE_REGIONS: boolean

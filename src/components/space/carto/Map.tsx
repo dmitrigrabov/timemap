@@ -1,6 +1,6 @@
 import { bindActionCreators } from 'redux'
 import L from 'leaflet'
-import { Component, RefObject, createRef } from 'react'
+import { Component, RefObject, createRef, KeyboardEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { Portal } from 'react-portal'
 import Supercluster from 'supercluster'
@@ -28,12 +28,18 @@ import {
   calcClusterSize
 } from 'common/utilities'
 import { AppDispatch } from 'store'
-import { StoreState } from 'store/types'
+import { Narrative, StoreState } from 'store/types'
 
 // NB: important constants for map, TODO: make statics
 // Note: Base map is OpenStreetMaps by default; can choose another base map
 const supportedMapboxMap = ['streets', 'satellite']
 const defaultToken = 'your_token'
+
+type OnClusterSelectArgs = {
+  id: string
+  latitude: number
+  longitude: number
+}
 
 const getMapDetails = (map: L.Map) => {
   const bounds = map.getBounds()
@@ -47,8 +53,17 @@ const getMapDetails = (map: L.Map) => {
   return [bbox, zoom]
 }
 
+type MapMethods = {
+  onSelectNarrative: (narrative: Narrative) => void
+  getCategoryColor: (category: string) => string
+  onSelect: ((step: number) => void) | ((event: Event) => void)
+}
+
 type MapProps = ReturnType<typeof mapStateToProps> &
-  ReturnType<typeof mapDispatchToProps>
+  ReturnType<typeof mapDispatchToProps> & {
+    onKeyDown: (e: KeyboardEvent<Element>) => void
+    methods: MapMethods
+  }
 
 type MapState = {
   mapTransformX: number
@@ -305,7 +320,11 @@ class Map extends Component<MapProps, MapState> {
     })
   }
 
-  projectPoint(location) {
+  projectPoint(location: [number, number]) {
+    if (!this.map) {
+      return
+    }
+
     const latLng = new L.LatLng(location[0], location[1])
     return {
       x: this.map.latLngToLayerPoint(latLng).x + this.state.mapTransformX,
@@ -313,17 +332,22 @@ class Map extends Component<MapProps, MapState> {
     }
   }
 
-  onClusterSelect({ id, latitude, longitude }) {
+  onClusterSelect({ id, latitude, longitude }: OnClusterSelectArgs) {
+    if (!this.superclusterIndex) {
+      return
+    }
+
     const expansionZoom = Math.max(
       this.superclusterIndex.getClusterExpansionZoom(parseInt(id)),
       this.superclusterIndex.options.minZoom
     )
+
     const zoomLevelsToSkip = 2
     const zoomToFly = Math.max(
       expansionZoom + zoomLevelsToSkip,
       this.props.app.cluster.maxZoom
     )
-    this.map.flyTo(new L.LatLng(latitude, longitude), zoomToFly)
+    this.map?.flyTo(new L.LatLng(latitude, longitude), zoomToFly)
   }
 
   getClientDims() {

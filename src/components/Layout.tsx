@@ -25,6 +25,7 @@ import { Component, KeyboardEvent } from 'react'
 import { DomainExternal, StoreState, Narrative, Event } from 'store/types'
 import { Actions, default as actionsObject } from 'actions'
 import MapCarto from 'components/space/carto/Map'
+import { AppDispatch } from 'store'
 
 type DashboardProps = StoreState & {
   actions: Actions
@@ -134,12 +135,13 @@ class Dashboard extends Component<DashboardProps> {
     this.props.actions.updateSelected(matchedEvents)
   }
 
-  getCategoryColor(category) {
+  getCategoryColor(category: string) {
     if (!this.props.features.USE_CATEGORIES) {
       return fallbackEventColor
     }
 
-    const cat = this.props.ui.style.categories[category]
+    const cat: string | undefined = this.props.ui.style.categories[category]
+
     if (cat) {
       return cat
     } else {
@@ -366,24 +368,27 @@ class Dashboard extends Component<DashboardProps> {
           }}
         />
         <MapCarto
-          kind="map" //{'map' in app ? 'map' : 'space3d'}
-          onKeyDown={this.onKeyDown}
+          //{'map' in app ? 'map' : 'space3d'}
+          onKeyDown={event => this.onKeyDown(event)}
           methods={{
-            onSelectNarrative: this.setNarrative,
-            getCategoryColor: this.getCategoryColor,
+            onSelectNarrative: (narrative: Narrative) =>
+              this.setNarrative(narrative),
+            getCategoryColor: (category: string) =>
+              this.getCategoryColor(category),
             onSelect: app.associations.narrative
-              ? this.selectNarrativeStep
-              : ev => this.handleSelect(ev, 1)
+              ? (step: number) => this.selectNarrativeStep(step)
+              : (event: Event) => this.handleSelect(event, 1)
           }}
         />
         <Timeline
-          onKeyDown={this.onKeyDown}
+          onKeyDown={event => this.onKeyDown(event)}
           methods={{
             onSelect: app.associations.narrative
               ? this.selectNarrativeStep
               : ev => this.handleSelect(ev, 0),
             onUpdateTimerange: actions.updateTimeRange,
-            getCategoryColor: this.getCategoryColor
+            getCategoryColor: (category: string) =>
+              this.getCategoryColor(category)
           }}
         />
         <CardStack
@@ -394,7 +399,7 @@ class Dashboard extends Component<DashboardProps> {
           }
           onHighlight={this.handleHighlight}
           onToggleCardstack={() => actions.updateSelected([])}
-          getCategoryColor={this.getCategoryColor}
+          getCategoryColor={category => this.getCategoryColor(category)}
         />
         <NarrativeControls
           narrative={
@@ -461,7 +466,7 @@ class Dashboard extends Component<DashboardProps> {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: AppDispatch) {
   return {
     actions: bindActionCreators(actionsObject, dispatch)
   }

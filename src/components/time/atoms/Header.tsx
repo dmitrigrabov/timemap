@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 // import { makeNiceDate } from '../../../common/utilities'
 import { DateRangeInput } from '@datepicker-react/styled'
 import { ThemeProvider } from 'styled-components'

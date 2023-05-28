@@ -1,6 +1,6 @@
-import React from 'react'
+import { FC } from 'react'
 
-const DatetimeBar = ({
+const DatetimeBar: FC = ({
   highlights,
   events,
   x,

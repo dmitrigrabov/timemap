@@ -1,4 +1,4 @@
-import { Component, createRef } from 'react'
+import { Component, RefObject, createRef } from 'react'
 import { axisBottom, timeFormat, select, AxisScale, AxisDomain } from 'd3'
 import { setD3Locale } from 'common/utilities'
 import { Dimensions } from 'store/types'
@@ -21,6 +21,9 @@ class TimelineAxis<Domain extends AxisDomain> extends Component<
   TimelineAxisProps<Domain>,
   TimelineAxisState
 > {
+  xAxis0Ref: RefObject<SVGGElement>
+  xAxis1Ref: RefObject<SVGGElement>
+
   constructor(props: TimelineAxisProps<Domain>) {
     super(props)
     this.xAxis0Ref = createRef()

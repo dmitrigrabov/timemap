@@ -1,12 +1,7 @@
-import React from 'react'
-import { primaryHighlight } from '../../../common/global'
+import { primaryHighlight } from 'common/global'
 import hash from 'object-hash'
-import {
-  getEventCategories,
-  isLatitude,
-  isLongitude
-} from '../../../common/utilities'
-import { AVAILABLE_SHAPES } from '../../../common/constants'
+import { getEventCategories, isLatitude, isLongitude } from 'common/utilities'
+import { AVAILABLE_SHAPES } from 'common/constants'
 
 const TimelineMarkers = ({
   styles,

@@ -1,13 +1,18 @@
-import { Component, createRef } from 'react'
+import { Component, RefObject, createRef, KeyboardEvent } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { scaleTime, timeMinute, timeSecond } from 'd3'
+import {
+  D3DragEvent,
+  DraggedElementBaseType,
+  ScaleTime,
+  scaleTime,
+  timeMinute,
+  timeSecond
+} from 'd3'
 import hash from 'object-hash'
-
-import { setLoading, setNotLoading, updateTicks } from 'actions'
+import actions from 'actions'
 import * as selectors from 'selectors'
 import copy from 'common/data/copy.json'
-
 import Header from 'components/time/atoms/Header'
 import Axis from 'components/time/Axis'
 import Clip from 'components/time/atoms/Clip'
@@ -16,13 +21,42 @@ import ZoomControls from 'components/time/atoms/ZoomControls'
 import Markers from 'components/time/atoms/Markers'
 import Events from 'components/time/atoms/Events'
 import Categories from 'components/time/Categories'
-import { Dimensions, StoreState } from 'store/types'
+import {
+  CategoryAssociation,
+  Dimensions,
+  StoreState,
+  TimeRange,
+  ZoomLevel
+} from 'store/types'
 
-type TimelineProps = {
-  dimensions: Dimensions
+const { setLoading, setNotLoading, updateTicks } = actions
+
+type TimelineProps = ReturnType<typeof mapStateToProps> &
+  ReturnType<typeof mapDispatchToProps> & {
+    onKeyDown: (e: KeyboardEvent<Element>) => void
+    dimensions: Dimensions
+    methods: TimelineMethods
+  }
+
+type TimelineMethods = {
+  onUpdateTimerange: (timerange: TimeRange) => void
+  getCategoryColor: (category: string) => string
+  onSelect: ((step: number) => void) | ((event: Event) => void)
 }
 
-class Timeline extends Component<TimelineProps> {
+type TimelineState = {
+  isFolded: boolean
+  timerange: TimeRange
+  dims: Dimensions
+  scaleX: ScaleTime<number, number, never> | null
+  scaleY: ((cat: CategoryAssociation) => number) | null
+  dragPos0: number | null
+  transitionDuration: number
+}
+
+class Timeline extends Component<TimelineProps, TimelineState> {
+  svgRef: RefObject<SVGElement>
+
   constructor(props: TimelineProps) {
     super(props)
     this.styleDatetime = this.styleDatetime.bind(this)
@@ -34,12 +68,13 @@ class Timeline extends Component<TimelineProps> {
     this.onDrag = this.onDrag.bind(this)
     this.onDragEnd = this.onDragEnd.bind(this)
     this.svgRef = createRef()
+
     this.state = {
       isFolded: false,
       dims: props.dimensions,
       scaleX: null,
       scaleY: null,
-      timerange: [null, null], // two datetimes
+      timerange: [], // two datetimes
       dragPos0: null,
       transitionDuration: 300
     }
@@ -49,7 +84,7 @@ class Timeline extends Component<TimelineProps> {
     this.addEventListeners()
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: TimelineProps) {
     if (hash(nextProps) !== hash(this.props)) {
       this.setState({
         timerange: nextProps.app.timeline.range,
@@ -103,7 +138,11 @@ class Timeline extends Component<TimelineProps> {
       ])
   }
 
-  makeScaleY(categories, trackHeight, marginTop) {
+  makeScaleY(
+    categories: CategoryAssociation[],
+    trackHeight: number,
+    marginTop: number
+  ) {
     const { features } = this.props
     if (features.GRAPH_NONLOCATED && features.GRAPH_NONLOCATED.categories) {
       categories = categories.filter(
@@ -112,21 +151,23 @@ class Timeline extends Component<TimelineProps> {
     }
 
     const extraPadding = 0
+
     const catHeight =
       categories.length > 2
         ? trackHeight / categories.length
         : trackHeight / (categories.length + 1)
-    const catsYpos = categories.map((g, i) => {
+
+    const catsYpos: number[] = categories.map((_, i) => {
       return (i + 1) * catHeight + marginTop + extraPadding / 2
     })
 
-    return cat => {
+    return (cat: CategoryAssociation) => {
       const idx = categories.indexOf(cat)
       return catsYpos[idx]
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: TimelineProps, prevState: TimelineState) {
     if (prevState.timerange !== this.state.timerange) {
       this.setState({ scaleX: this.makeScaleX() })
     }
@@ -151,10 +192,10 @@ class Timeline extends Component<TimelineProps> {
 
   computeDims() {
     const dom = this.props.ui.dom.timeline
-    if (document.querySelector(`#${dom}`) !== null) {
-      const boundingClient = document
-        .querySelector(`#${dom}`)
-        .getBoundingClientRect()
+    const domEl = window?.document.querySelector(`#${dom}`)
+
+    if (domEl) {
+      const boundingClient = domEl.getBoundingClientRect()
 
       this.setState(
         {
@@ -175,6 +216,9 @@ class Timeline extends Component<TimelineProps> {
    * @param {String} direction: 'forward' / 'backwards'
    */
   onMoveTime(direction: 'forward' | 'backwards') {
+    if (!this.state.scaleX) {
+      return
+    }
     const extent = this.getTimeScaleExtent()
     const newCentralTime = timeMinute.offset(
       this.state.scaleX.domain()[0],
@@ -195,7 +239,7 @@ class Timeline extends Component<TimelineProps> {
     this.props.methods.onSelect([])
   }
 
-  onCenterTime(newCentralTime) {
+  onCenterTime(newCentralTime: Date) {
     const extent = this.getTimeScaleExtent()
 
     const domain0 = timeMinute.offset(newCentralTime, -extent / 2)
@@ -211,7 +255,7 @@ class Timeline extends Component<TimelineProps> {
    * WITHOUT updating the store, or data shown.
    * Used for updates in the middle of a transition, for performance purposes
    */
-  onSoftTimeRangeUpdate(timerange) {
+  onSoftTimeRangeUpdate(timerange: TimeRange) {
     this.setState({ timerange })
   }
 
@@ -219,23 +263,25 @@ class Timeline extends Component<TimelineProps> {
    * Apply zoom level to timeline
    * @param {object} zoom: zoom level from zoomLevels
    */
-  onApplyZoom(zoom) {
+  onApplyZoom(zoom: ZoomLevel) {
+    if (!this.state.scaleX) {
+      return
+    }
+
+    const [startDate] = this.state.scaleX.domain()
+
     const extent = this.getTimeScaleExtent()
-    const newCentralTime = timeMinute.offset(
-      this.state.scaleX.domain()[0],
-      extent / 2
-    )
+    const newCentralTime = timeMinute.offset(startDate, extent / 2)
     const { rangeLimits } = this.props.app.timeline
 
     let newDomain0 = timeMinute.offset(newCentralTime, -zoom.duration / 2)
     let newDomainF = timeMinute.offset(newCentralTime, zoom.duration / 2)
 
-    if (rangeLimits) {
-      // If the store contains absolute time limits,
-      // make sure the zoom doesn't go over them
-      const minDate = rangeLimits[0]
-      const maxDate = rangeLimits[1]
+    // If the store contains absolute time limits,
+    // make sure the zoom doesn't go over them
+    const [minDate, maxDate] = rangeLimits
 
+    if (minDate && maxDate) {
       if (newDomain0 < minDate) {
         newDomain0 = minDate
         newDomainF = timeMinute.offset(newDomain0, zoom.duration)
@@ -257,15 +303,19 @@ class Timeline extends Component<TimelineProps> {
     )
   }
 
-  toggleTransition(isTransition) {
+  toggleTransition(isTransition: boolean) {
     this.setState({ transitionDuration: isTransition ? 300 : 0 })
   }
 
   /*
    * Setup drag behavior
    */
-  onDragStart(event) {
+  onDragStart<GElement extends DraggedElementBaseType, Datum, Subject>(
+    event: D3DragEvent<GElement, Datum, Subject>
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     event.sourceEvent.stopPropagation()
+
     this.setState(
       {
         dragPos0: event.x
@@ -279,21 +329,32 @@ class Timeline extends Component<TimelineProps> {
   /*
    * Drag and update
    */
-  onDrag(event) {
+  onDrag<GElement extends DraggedElementBaseType, Datum, Subject>(
+    event: D3DragEvent<GElement, Datum, Subject>
+  ) {
+    if (!this.state.scaleX || this.state.dragPos0 === null) {
+      return
+    }
+
     const drag0 = this.state.scaleX.invert(this.state.dragPos0).getTime()
     const dragNow = this.state.scaleX.invert(event.x).getTime()
     const timeShift = (drag0 - dragNow) / 1000
 
     const { range, rangeLimits } = this.props.app.timeline
-    let newDomain0 = timeSecond.offset(range[0], timeShift)
-    let newDomainF = timeSecond.offset(range[1], timeShift)
+    const [startDate, endDate] = range
 
-    if (rangeLimits) {
-      // If the store contains absolute time limits,
-      // make sure the zoom doesn't go over them
-      const minDate = rangeLimits[0]
-      const maxDate = rangeLimits[1]
+    if (!startDate || !endDate) {
+      return
+    }
 
+    let newDomain0 = timeSecond.offset(startDate, timeShift)
+    let newDomainF = timeSecond.offset(endDate, timeShift)
+
+    // If the store contains absolute time limits,
+    // make sure the zoom doesn't go over them
+    const [minDate, maxDate] = rangeLimits
+
+    if (minDate && maxDate) {
       newDomain0 = newDomain0 < minDate ? minDate : newDomain0
       newDomainF = newDomainF > maxDate ? maxDate : newDomainF
     }
@@ -310,8 +371,8 @@ class Timeline extends Component<TimelineProps> {
     this.props.methods.onUpdateTimerange(this.state.timerange)
   }
 
-  getDatetimeX(datetime) {
-    return this.state.scaleX(datetime)
+  getDatetimeX(datetime: Date) {
+    return this.state.scaleX?.(datetime)
   }
 
   getY(event) {

@@ -1,5 +1,4 @@
-import React from 'react'
-import { isOdd } from '../../../common/utilities'
+import { isOdd } from 'common/utilities'
 
 function createStar(numPoints, r, x, y) {
   const innerRadius = r

@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Project = ({
   offset,
   id,
@@ -13,7 +11,9 @@ const Project = ({
   onClick
 }) => {
   const length = getX(end) - getX(start)
-  if (offset === undefined) return null
+  if (offset === undefined) {
+    return null
+  }
   return (
     <rect
       onClick={onClick}

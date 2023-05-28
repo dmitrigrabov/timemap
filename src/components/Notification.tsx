@@ -1,6 +1,6 @@
-import React from 'react'
+import { Component } from 'react'
 
-export default class Notification extends React.Component {
+export default class Notification extends Component {
   constructor(props) {
     super()
     this.state = {
@@ -13,7 +13,9 @@ export default class Notification extends React.Component {
   }
 
   renderItems(items) {
-    if (!items) return ''
+    if (!items) {
+      return ''
+    }
     return (
       <div>
         {items.map((item, idx) => {
@@ -40,7 +42,9 @@ export default class Notification extends React.Component {
   }
 
   render() {
-    if (!this.props.notifications) return null
+    if (!this.props.notifications) {
+      return null
+    }
     const notificationsToRender = this.props.notifications.filter(
       n => !('isRead' in n && n.isRead)
     )

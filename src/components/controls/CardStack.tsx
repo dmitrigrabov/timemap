@@ -5,16 +5,11 @@ import * as selectors from 'selectors'
 import { getFilterIdxFromColorSet } from 'common/utilities'
 import copy from 'common/data/copy.json'
 import hash from 'object-hash'
-import { Content, Event, Language, Narrative, StoreState } from 'store/types'
+import { Content, Dimensions, Event, StoreState } from 'store/types'
 
-type CardStackProps = {
-  language: Language
-  isCardstack: boolean
-  narrative: Narrative
-  selected: Event[]
-  colors: string[]
-  cardUI: unknown
-  isLoading: boolean
+type CardStackProps = ReturnType<typeof mapStateToProps> & {
+  getCategoryColor: (category: string) => string
+  timelineDims: Dimensions
 }
 
 class CardStack extends Component<CardStackProps> {

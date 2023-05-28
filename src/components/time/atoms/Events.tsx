@@ -222,12 +222,10 @@ const TimelineEvents = ({
     return acc
   }
 
-  let renderProjects = () => null
-  if (features.GRAPH_NONLOCATED) {
-    renderProjects = function () {
-      return (
-        <>
-          {Object.values(projects).map(project => (
+  return (
+    <g clipPath="url(#clip)">
+      {features.GRAPH_NONLOCATED
+        ? Object.values(projects).map(project => (
             <Project
               key={project.id}
               {...project}
@@ -237,15 +235,8 @@ const TimelineEvents = ({
               dims={dims}
               colour={getCategoryColor(project.category)}
             />
-          ))}
-        </>
-      )
-    }
-  }
-
-  return (
-    <g clipPath="url(#clip)">
-      {renderProjects()}
+          ))
+        : null}
       {events.reduce(renderEvent, [])}
     </g>
   )

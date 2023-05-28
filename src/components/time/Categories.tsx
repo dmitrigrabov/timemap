@@ -1,4 +1,4 @@
-import { Component, createRef } from 'react'
+import { Component, RefObject, createRef } from 'react'
 import { drag as d3Drag, select } from 'd3'
 import { Dimensions, FeaturesState } from 'store/types'
 
@@ -17,6 +17,8 @@ class TimelineCategories extends Component<
   TimelineCategoriesProps,
   TimelineCategoriesState
 > {
+  grabRef: RefObject<SVGRectElement>
+
   constructor(props: TimelineCategoriesProps) {
     super(props)
     this.grabRef = createRef()

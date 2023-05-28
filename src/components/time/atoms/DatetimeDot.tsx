@@ -1,6 +1,4 @@
-import React from 'react'
-
-export default ({
+const DatetimeDot = ({
   category,
   events,
   x,
@@ -10,7 +8,9 @@ export default ({
   styleProps,
   extraRender
 }) => {
-  if (!y) return null
+  if (!y) {
+    return null
+  }
   return (
     <circle
       onClick={onSelect}
@@ -22,3 +22,5 @@ export default ({
     />
   )
 }
+
+export default DatetimeDot
