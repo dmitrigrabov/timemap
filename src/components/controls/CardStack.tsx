@@ -1,4 +1,4 @@
-import { Component, createRef } from 'react'
+import { Component, RefObject, createRef } from 'react'
 import { connect } from 'react-redux'
 import { generateCardLayout, Card } from 'components/controls/Card'
 import * as selectors from 'selectors'
@@ -13,6 +13,9 @@ type CardStackProps = ReturnType<typeof mapStateToProps> & {
 }
 
 class CardStack extends Component<CardStackProps> {
+  refCardStack: RefObject<HTMLDivElement>
+  refCardStackContent: RefObject<HTMLDivElement>
+
   constructor(props: CardStackProps) {
     super(props)
     this.refs = {}
