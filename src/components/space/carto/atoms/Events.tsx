@@ -8,7 +8,7 @@ import {
   zipColorsToPercentages
 } from 'common/utilities'
 
-function MapEvents({
+const MapEvents = ({
   getCategoryColor,
   categories,
   projectPoint,
@@ -22,7 +22,7 @@ function MapEvents({
   coloringSet,
   filterColors,
   features
-}) {
+}) => {
   function handleEventSelect(e, location) {
     const events = e.shiftKey
       ? selected.concat(location.events)

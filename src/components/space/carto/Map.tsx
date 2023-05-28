@@ -1,6 +1,5 @@
-/* global L */
 import { bindActionCreators } from 'redux'
-import 'leaflet'
+import L from 'leaflet'
 import { Component, RefObject, createRef } from 'react'
 import { flushSync } from 'react-dom'
 import { Portal } from 'react-portal'
@@ -36,11 +35,29 @@ import { StoreState } from 'store/types'
 const supportedMapboxMap = ['streets', 'satellite']
 const defaultToken = 'your_token'
 
+const getMapDetails = (map: L.Map) => {
+  const bounds = map.getBounds()
+  const bbox: GeoJSON.BBox = [
+    bounds.getWest(),
+    bounds.getSouth(),
+    bounds.getEast(),
+    bounds.getNorth()
+  ]
+  const zoom = map.getZoom()
+  return [bbox, zoom]
+}
+
 type MapProps = ReturnType<typeof mapStateToProps> &
   ReturnType<typeof mapDispatchToProps>
 
-class Map extends Component<MapProps> {
-  svgRef: RefObject<unknown>
+type MapState = {
+  mapTransformX: number
+  mapTransformY: number
+  indexLoaded: boolean
+  clusters: unknown[]
+}
+class Map extends Component<MapProps, MapState> {
+  svgRef: RefObject<SVGElement>
   map: L.Map | null
   superclusterIndex: Supercluster | null
   tileLayer: L.TileLayer | null
@@ -55,6 +72,7 @@ class Map extends Component<MapProps> {
     this.map = null
     this.superclusterIndex = null
     this.tileLayer = null
+
     this.state = {
       mapTransformX: 0,
       mapTransformY: 0,
@@ -96,13 +114,11 @@ class Map extends Component<MapProps> {
         if (eventPoint?.latitude && eventPoint?.longitude) {
           // this.map.setView([eventPoint.latitude, eventPoint.longitude])
           this.map?.setView(
-            [eventPoint.latitude, eventPoint.longitude],
+            [parseFloat(eventPoint.latitude), parseFloat(eventPoint.longitude)],
             this.map.getZoom(),
             {
               animate: true,
-              pan: {
-                duration: 0.7
-              }
+              duration: 0.7
             }
           )
         }
@@ -112,7 +128,8 @@ class Map extends Component<MapProps> {
 
   // https://studio.mapbox.com/styles/dmitrig/cl2xts14f000414t4geqv53r5/edit/#9/37.78/-122.4241
 
-  getTileUrl(tiles) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTileUrl(tiles: string) {
     return 'https://map.data-helper.net/styles/bright/{z}/{x}/{y}@2x.png'
   }
 
@@ -160,9 +177,9 @@ class Map extends Component<MapProps> {
     })
 
     map.on('zoomend viewreset', () => {
-      this.map.dragging.enable()
-      this.map.doubleClickZoom.enable()
-      this.map.scrollWheelZoom.enable()
+      this.map?.dragging.enable()
+      this.map?.doubleClickZoom.enable()
+      this.map?.scrollWheelZoom.enable()
       flushSync(() => {
         this.alignLayers()
         this.updateClusters()
@@ -185,20 +202,13 @@ class Map extends Component<MapProps> {
     this.map = map
   }
 
-  getMapDetails() {
-    const bounds = this.map.getBounds()
-    const bbox = [
-      bounds.getWest(),
-      bounds.getSouth(),
-      bounds.getEast(),
-      bounds.getNorth()
-    ]
-    const zoom = this.map.getZoom()
-    return [bbox, zoom]
-  }
-
   updateClusters() {
-    const [bbox, zoom] = this.getMapDetails()
+    if (!this.map) {
+      return
+    }
+
+    const [bbox, zoom] = getMapDetails(this.map)
+
     if (this.superclusterIndex && this.state.indexLoaded) {
       this.setState({
         clusters: this.superclusterIndex.getClusters(bbox, zoom)
@@ -236,7 +246,7 @@ class Map extends Component<MapProps> {
     }
   }
 
-  getClusterChildren(clusterId) {
+  getClusterChildren(clusterId: number) {
     if (this.superclusterIndex) {
       try {
         const children = this.superclusterIndex.getLeaves(

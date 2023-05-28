@@ -126,10 +126,15 @@ export type Toolbar = {
   panels: Panels
 }
 
+type Bounds = [[number, number], [number, number]]
+
 export type Map = {
   anchor: [number, number]
-  bounds: [[number, number], [number, number]]
+  bounds: Bounds
+  maxBounds: Bounds
   startZoom: number
+  minZoom: number
+  maxZoom: number
 }
 
 export type Notification = {
