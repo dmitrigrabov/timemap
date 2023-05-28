@@ -1,7 +1,7 @@
 /* global L */
 import { bindActionCreators } from 'redux'
 import 'leaflet'
-import { Component } from 'react'
+import { Component, RefObject, createRef } from 'react'
 import { flushSync } from 'react-dom'
 import { Portal } from 'react-portal'
 import Supercluster from 'supercluster'
@@ -36,9 +36,17 @@ import { StoreState } from 'store/types'
 const supportedMapboxMap = ['streets', 'satellite']
 const defaultToken = 'your_token'
 
-class Map extends Component {
-  constructor() {
-    super()
+type MapProps = ReturnType<typeof mapStateToProps> &
+  ReturnType<typeof mapDispatchToProps>
+
+class Map extends Component<MapProps> {
+  svgRef: RefObject<unknown>
+  map: L.Map | null
+  superclusterIndex: Supercluster | null
+  tileLayer: L.TileLayer | null
+
+  constructor(props: MapProps) {
+    super(props)
     this.projectPoint = this.projectPoint.bind(this)
     this.onClusterSelect = this.onClusterSelect.bind(this)
     this.loadClusterData = this.loadClusterData.bind(this)
@@ -64,20 +72,20 @@ class Map extends Component {
     window.dispatchEvent(new Event('resize'))
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: MapProps) {
     if (prevProps.ui.tiles !== this.props.ui.tiles && this.map) {
       this.initializeTileLayer()
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: MapProps) {
     if (!isIdentical(nextProps.domain.locations, this.props.domain.locations)) {
       this.loadClusterData(nextProps.domain.locations)
     }
 
     // Set appropriate zoom for narrative
     const { bounds } = nextProps.app.map
-    if (!isIdentical(bounds, this.props.app.map.bounds) && bounds !== null) {
+    if (!isIdentical(bounds, this.props.app.map.bounds) && bounds && this.map) {
       this.map.fitBounds(bounds)
     } else {
       if (!isIdentical(nextProps.app.selected, this.props.app.selected)) {
@@ -85,13 +93,9 @@ class Map extends Component {
         const eventPoint =
           nextProps.app.selected.length > 0 ? nextProps.app.selected[0] : null
 
-        if (
-          eventPoint !== null &&
-          eventPoint.latitude &&
-          eventPoint.longitude
-        ) {
+        if (eventPoint?.latitude && eventPoint?.longitude) {
           // this.map.setView([eventPoint.latitude, eventPoint.longitude])
-          this.map.setView(
+          this.map?.setView(
             [eventPoint.latitude, eventPoint.longitude],
             this.map.getZoom(),
             {

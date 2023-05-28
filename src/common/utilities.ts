@@ -4,7 +4,7 @@ import hash from 'object-hash'
 import { timeFormatDefaultLocale } from 'd3'
 import { POLYGON_CLIP_PATH } from 'common/constants'
 import { apiRoot, dateFormat, timeFormat } from 'config'
-import { AppState } from 'store/types'
+import { AppState, Source, Event, EventPostValidation } from 'store/types'
 
 dayjs.extend(customParseFormat)
 
@@ -255,16 +255,20 @@ export function createFilterPathString(filter) {
  * source, call with two sets of parentheses:
  *      const src = insetSourceFrom(sources)(anEvent)
  */
-export function insetSourceFrom(allSources) {
-  return event => {
-    let sources
-    if (!event.sources) {
-      sources = []
-    } else {
-      sources = event.sources.map(id => {
-        return allSources.hasOwnProperty(id) ? allSources[id] : null
-      })
-    }
+export function insetSourceFrom(
+  allSources: Record<string, Source>
+): (event: EventPostValidation) => Event {
+  return (event: EventPostValidation) => {
+    const sources: Source[] = event.sources
+      ? event.sources
+          .map(id => {
+            return allSources.hasOwnProperty(id) ? allSources[id] : null
+          })
+          .filter((source): source is Source => {
+            return source !== null
+          })
+      : []
+
     return {
       ...event,
       sources

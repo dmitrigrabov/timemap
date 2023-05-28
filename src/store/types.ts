@@ -128,6 +128,7 @@ export type Toolbar = {
 
 export type Map = {
   anchor: [number, number]
+  bounds: [[number, number], [number, number]]
   startZoom: number
 }
 
@@ -155,6 +156,7 @@ export type AppState = {
   selected: Event[]
   source: Source
   associations: AssociationsObject
+  narrative: Narrative
   shapes: string[]
   isMobile: boolean
   language: Language
@@ -164,7 +166,7 @@ export type AppState = {
   cover: Cover
   toolbar: Toolbar
   loading: boolean
-  map?: Map
+  map: Map
   searchQuery?: string
   filters: Record<string, unknown[]>
   intro: string[]

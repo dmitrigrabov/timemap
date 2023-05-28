@@ -13,7 +13,6 @@ import MediaOverlay from 'components/atoms/Media'
 import LoadingOverlay from 'components/atoms/Loading'
 
 import Timeline from 'components/time/Timeline'
-import Space from 'components/space/Space'
 import Search from 'components/controls/Search'
 import CardStack from 'components/controls/CardStack'
 import NarrativeControls from 'components/controls/NarrativeControls'
@@ -22,12 +21,14 @@ import { fallbackEventColor } from 'common/global'
 import { binarySearch } from 'common/utilities'
 import { isMobileOnly } from 'react-device-detect'
 
-import { Component } from 'react'
-import { DomainExternal, StoreState, Narrative } from 'store/types'
+import { Component, KeyboardEvent } from 'react'
+import { DomainExternal, StoreState, Narrative, Event } from 'store/types'
 import { Actions, default as actionsObject } from 'actions'
+import MapCarto from 'components/space/carto/Map'
 
 type DashboardProps = StoreState & {
   actions: Actions
+  narrativeIdx: number
 }
 
 class Dashboard extends Component<DashboardProps> {
@@ -37,7 +38,7 @@ class Dashboard extends Component<DashboardProps> {
     this.handleViewSource = this.handleViewSource.bind(this)
     this.handleHighlight = this.handleHighlight.bind(this)
     this.setNarrative = this.setNarrative.bind(this)
-    this.setNarrativeFromFilters = this.setNarrativeFromFilters.bind(this)
+    // this.setNarrativeFromFilters = this.setNarrativeFromFilters.bind(this)
     this.handleSelect = this.handleSelect.bind(this)
     this.getCategoryColor = this.getCategoryColor.bind(this)
     this.findEventIdx = this.findEventIdx.bind(this)
@@ -81,15 +82,15 @@ class Dashboard extends Component<DashboardProps> {
     })
   }
 
-  handleSelect(selected, axis) {
-    if (selected.length <= 0) {
+  handleSelect(selected: Event | Event[], axis?: number) {
+    if (Array.isArray(selected) && selected.length <= 0) {
       this.props.actions.updateSelected([])
       return
     }
 
     const matchedEvents = []
     const TIMELINE_AXIS = 0
-    if (axis === TIMELINE_AXIS) {
+    if (!Array.isArray(selected) && axis === TIMELINE_AXIS) {
       matchedEvents.push(selected)
       // find in events
       const { events } = this.props.domain
@@ -146,7 +147,7 @@ class Dashboard extends Component<DashboardProps> {
     }
   }
 
-  setNarrative(narrativ: Narrative) {
+  setNarrative(narrative: Narrative) {
     // only handleSelect if narrative is not null and has associated events
     if (narrative && narrative.steps.length >= 1) {
       this.handleSelect([narrative.steps[0]])
@@ -227,18 +228,18 @@ class Dashboard extends Component<DashboardProps> {
     }
   }
 
-  onKeyDown(e) {
+  onKeyDown(e: KeyboardEvent) {
     const { narrative, selected } = this.props.app
     const { events } = this.props.domain
 
-    const prev = idx => {
+    const prev = (idx: number) => {
       if (narrative === null) {
         this.handleSelect(events[idx - 1], 0)
       } else {
         this.selectNarrativeStep(this.props.narrativeIdx - 1)
       }
     }
-    const next = idx => {
+    const next = (idx: number) => {
       if (narrative === null) {
         this.handleSelect(events[idx + 1], 0)
       } else {
@@ -364,8 +365,8 @@ class Dashboard extends Component<DashboardProps> {
             }
           }}
         />
-        <Space
-          kind={'map' in app ? 'map' : 'space3d'}
+        <MapCarto
+          kind="map" //{'map' in app ? 'map' : 'space3d'}
           onKeyDown={this.onKeyDown}
           methods={{
             onSelectNarrative: this.setNarrative,
