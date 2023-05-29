@@ -1,13 +1,22 @@
 import { Component, RefObject, createRef } from 'react'
-import { drag as d3Drag, select } from 'd3'
-import { CategoryAssociation, Dimensions, FeaturesState } from 'store/types'
+import { D3DragEvent, DraggedElementBaseType, drag as d3Drag, select } from 'd3'
+import { Dimensions, FeaturesState } from 'store/types'
 
 type TimelineCategoriesProps = {
   dims: Dimensions
   features: FeaturesState
-  categories: CategoryAssociation[]
+  categories: string[]
   fallbackLabel: string
   getCategoryY: (cat: string) => number
+  onDragStart<GElement extends DraggedElementBaseType, Datum, Subject>(
+    event: D3DragEvent<GElement, Datum, Subject>
+  ): void
+  onDrag<GElement extends DraggedElementBaseType, Datum, Subject>(
+    event: D3DragEvent<GElement, Datum, Subject>
+  ): void
+  onDragEnd<GElement extends DraggedElementBaseType, Datum, Subject>(
+    event: D3DragEvent<GElement, Datum, Subject>
+  ): void
 }
 
 type TimelineCategoriesState = {
@@ -41,7 +50,7 @@ class TimelineCategories extends Component<
     }
   }
 
-  renderCategory(category: CategoryAssociation) {
+  renderCategory(category: string) {
     const { dims } = this.props
     const strokeWidth = 1 // dims.trackHeight / (this.props.categories.length + 1)
 
@@ -59,17 +68,17 @@ class TimelineCategories extends Component<
           className="tick"
           style={{ strokeWidth }}
           opacity="0.5"
-          transform={`translate(0,${this.props.getCategoryY(category.title)})`}
+          transform={`translate(0,${this.props.getCategoryY(category)})`}
         >
           <line x1={dims.marginLeft} x2={dims.width - dims.width_controls} />
         </g>
         <g
           className="tick"
           opacity="1"
-          transform={`translate(0,${this.props.getCategoryY(category.title)})`}
+          transform={`translate(0,${this.props.getCategoryY(category)})`}
         >
           <text x={dims.marginLeft - 5} dy="0.32em">
-            {category.title}
+            {category}
           </text>
         </g>
       </>

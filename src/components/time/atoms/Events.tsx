@@ -14,7 +14,15 @@ import {
   isLongitude
 } from 'common/utilities'
 import { AVAILABLE_SHAPES } from 'common/constants'
-import { Event } from 'store/types'
+import {
+  ColoringSet,
+  Dimensions,
+  Event,
+  FeaturesState,
+  Narrative
+} from 'store/types'
+import { FC, ReactElement } from 'react'
+import { CSSProperties } from 'styled-components'
 
 function renderDot(event: Event, styles, props) {
   const colorPercentages = calculateColorPercentages([event], props.coloringSet)
@@ -123,122 +131,130 @@ function renderStar(event: Event, styles, props) {
   )
 }
 
-const TimelineEvents = ({
+type TimelineEventsProps = {
+  events: Event[]
+  categories: string[]
+  narrative: Narrative
+  getDatetimeX: (value: Date) => number
+  getY: (event: Event) => number
+  getCategoryColor: (categeory: string) => string
+  transitionDuration: number
+  onSelect: (event: Event) => void
+  dims: Dimensions
+  features: FeaturesState
+  eventRadius: number
+  filterColors: string[]
+  coloringSet: ColoringSet
+}
+
+const TimelineEvents: FC<TimelineEventsProps> = ({
   events,
-  projects,
+  // projects,
   categories,
   narrative,
   getDatetimeX,
   getY,
   getCategoryColor,
-  getHighlights,
+  // getHighlights,
   onSelect,
   transitionDuration,
   dims,
   features,
-  setLoading,
-  setNotLoading,
   eventRadius,
   filterColors,
   coloringSet
 }) => {
   const narIds = narrative ? narrative.steps.map(s => s.id) : []
 
-  function renderEvent(acc, event) {
-    if (narrative) {
-      if (!narIds.includes(event.id)) {
-        return null
-      }
-    }
-    const isDot = isLatitude(event.latitude) && isLongitude(event.longitude)
-    // || (features.GRAPH_NONLOCATED && event.projectOffset !== -1)
-
-    const { shape: eventShape } = event
-
-    let renderShape = isDot ? renderDot : renderBar
-    if (eventShape && eventShape.shape) {
-      if (eventShape.shape === AVAILABLE_SHAPES.BAR) {
-        renderShape = renderBar
-      } else if (eventShape.shape === AVAILABLE_SHAPES.DIAMOND) {
-        renderShape = renderDiamond
-      } else if (eventShape.shape === AVAILABLE_SHAPES.STAR) {
-        renderShape = renderStar
-      } else if (eventShape.shape === AVAILABLE_SHAPES.TRIANGLE) {
-        renderShape = renderTriangle
-      } else if (eventShape.shape === AVAILABLE_SHAPES.PENTAGON) {
-        renderShape = renderPentagon
-      } else if (eventShape.shape === AVAILABLE_SHAPES.SQUARE) {
-        renderShape = renderSquare
-      } else {
-        renderShape = renderDot
-      }
-    }
-
-    // if an event has multiple categories, it should be rendered on each of
-    // those timelines: so we create as many event 'shadows' as there are
-    // categories
-    const evShadows = getEventCategories(event, categories).map(cat => {
-      const y = getY({ ...event, category: cat })
-
-      const colour = event.colour ? event.colour : getCategoryColor(cat.title)
-
-      const styles = {
-        fill: colour,
-        fillOpacity: y > 0 ? calcOpacity(1) : 0,
-        transition: `transform ${transitionDuration / 1000}s ease`
-      }
-
-      return { y, styles }
-    })
-
-    function getRender(y, styles) {
-      return renderShape(event, styles, {
-        x: getDatetimeX(event.datetime),
-        y,
-        eventRadius,
-        onSelect: () => onSelect(event),
-        dims,
-        highlights: features.HIGHLIGHT_GROUPS
-          ? getHighlights(
-              event.filters[
-                features.HIGHLIGHT_GROUPS.filterIndexIndicatingGroup
-              ]
-            )
-          : [],
-        features,
-        filterColors,
-        coloringSet
-      })
-    }
-
-    if (evShadows.length === 0) {
-      acc.push(getRender(getY(event), { fill: getCategoryColor(null) }))
-    } else {
-      evShadows.forEach(evShadow => {
-        acc.push(getRender(evShadow.y, evShadow.styles))
-      })
-    }
-    return acc
-  }
-
   return (
     <g clipPath="url(#clip)">
-      {/* {features.GRAPH_NONLOCATED
-        ? Object.values(projects).map(project => (
-            <Project
-              key={project.id}
-              {...project}
-              eventRadius={eventRadius}
-              onClick={() => console.log(project)}
-              getX={getDatetimeX}
-              dims={dims}
-              colour={getCategoryColor(project.category)}
-            />
-          ))
-        : null} */}
-      {events.reduce(renderEvent, [])}
+      {events.reduce<ReactElement[]>((acc, event) => {
+        if (narrative) {
+          if (!narIds.includes(event.id)) {
+            return null
+          }
+        }
+
+        const isDot = isLatitude(event.latitude) && isLongitude(event.longitude)
+        // || (features.GRAPH_NONLOCATED && event.projectOffset !== -1)
+
+        const { shape: eventShape } = event
+
+        let renderShape = isDot ? renderDot : renderBar
+        if (eventShape && eventShape.shape) {
+          if (eventShape.shape === AVAILABLE_SHAPES.BAR) {
+            renderShape = renderBar
+          } else if (eventShape.shape === AVAILABLE_SHAPES.DIAMOND) {
+            renderShape = renderDiamond
+          } else if (eventShape.shape === AVAILABLE_SHAPES.STAR) {
+            renderShape = renderStar
+          } else if (eventShape.shape === AVAILABLE_SHAPES.TRIANGLE) {
+            renderShape = renderTriangle
+          } else if (eventShape.shape === AVAILABLE_SHAPES.PENTAGON) {
+            renderShape = renderPentagon
+          } else if (eventShape.shape === AVAILABLE_SHAPES.SQUARE) {
+            renderShape = renderSquare
+          } else {
+            renderShape = renderDot
+          }
+        }
+
+        // if an event has multiple categories, it should be rendered on each of
+        // those timelines: so we create as many event 'shadows' as there are
+        // categories
+        const evShadows = getEventCategories(event, categories).map(cat => {
+          const y = getY({ ...event, category: cat })
+
+          const colour = event.colour
+            ? event.colour
+            : getCategoryColor(cat.title)
+
+          const styles = {
+            fill: colour,
+            fillOpacity: y > 0 ? calcOpacity(1) : 0,
+            transition: `transform ${transitionDuration / 1000}s ease`
+          }
+
+          return { y, styles }
+        })
+
+        if (evShadows.length === 0) {
+          acc.push(getRender(getY(event), { fill: getCategoryColor(null) }))
+        } else {
+          evShadows.forEach(evShadow => {
+            acc.push(getRender(evShadow.y, evShadow.styles))
+          })
+        }
+        return acc
+      }, [])}
     </g>
   )
 }
 
 export default TimelineEvents
+
+type GetRenderArgs = {
+  y: number
+  styles: CSSProperties
+  event: Event
+}
+
+const getRender = ({ y, styles, event }: GetRenderArgs) => {
+  return renderShape(event, styles, {
+    x: getDatetimeX(event.datetime),
+    y,
+    eventRadius,
+    onSelect: () => onSelect(event),
+    dims,
+    // highlights: features.HIGHLIGHT_GROUPS
+    //   ? getHighlights(
+    //       event.filters[
+    //         features.HIGHLIGHT_GROUPS.filterIndexIndicatingGroup
+    //       ]
+    //     )
+    //   : [],
+    features,
+    filterColors,
+    coloringSet
+  })
+}

@@ -22,7 +22,6 @@ import Markers from 'components/time/atoms/Markers'
 import Events from 'components/time/atoms/Events'
 import Categories from 'components/time/Categories'
 import {
-  CategoryAssociation,
   Dimensions,
   Event,
   StoreState,
@@ -522,18 +521,18 @@ class Timeline extends Component<TimelineProps, TimelineState> {
               />
               <Events
                 events={this.props.domain.events}
-                projects={this.props.domain.projects}
+                // projects={this.props.domain.projects}
                 categories={categories}
-                styleDatetime={this.styleDatetime}
+                // styleDatetime={this.styleDatetime}
                 narrative={this.props.app.narrative}
-                getDatetimeX={this.getDatetimeX}
-                getY={this.getY}
-                getHighlights={group => {
-                  if (group === 'None') {
-                    return []
-                  }
-                  return categories.map(c => c.group === group)
-                }}
+                getDatetimeX={date => this.getDatetimeX(date)}
+                getY={event => this.getY(event)}
+                // getHighlights={group => {
+                //   if (group === 'None') {
+                //     return []
+                //   }
+                //   return categories.map(c => c.group === group)
+                // }}
                 getCategoryColor={this.props.methods.getCategoryColor}
                 transitionDuration={this.state.transitionDuration}
                 onSelect={this.onSelect}

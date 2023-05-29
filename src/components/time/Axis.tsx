@@ -11,6 +11,7 @@ type TimelineAxisProps<Domain extends AxisDomain> = {
   extent: number
   scaleX: AxisScale<Domain>
   ticks: number
+  transitionDuration: number
 }
 
 type TimelineAxisState = {
