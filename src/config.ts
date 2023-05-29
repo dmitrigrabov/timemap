@@ -27,7 +27,7 @@ export const initialConfig = {
       USE_FULLSCREEN: true,
       USE_SOURCES: true,
       USE_COVER: false,
-      GRAPH_NONLOCATED: false,
+      // GRAPH_NONLOCATED: false,
       HIGHLIGHT_GROUPS: false
     }
   }

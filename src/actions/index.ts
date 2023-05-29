@@ -274,13 +274,13 @@ const clearFilter = (filter: string): ClearFilterAction => ({
 export type ToggleAssociationsAction = {
   type: 'TOGGLE_ASSOCIATIONS'
   association: 'filters' | 'categories'
-  value: Associations | Associations[]
+  value: string | string[]
   shouldColor?: boolean
 }
 
 const toggleAssociations = (
   association: 'filters' | 'categories',
-  value: Associations | Associations[],
+  value: string | string[],
   shouldColor?: boolean
 ): ToggleAssociationsAction => ({
   type: 'TOGGLE_ASSOCIATIONS',

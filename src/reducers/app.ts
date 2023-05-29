@@ -303,7 +303,7 @@ const setInitialCategories = (
     ...appState,
     associations: {
       ...appState.associations,
-      categories: categories
+      categories
     }
   }
 }

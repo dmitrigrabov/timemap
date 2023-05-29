@@ -1,3 +1,5 @@
+// It looks like this is only used with GRAPH_NONLOCATED
+
 const Project = ({
   offset,
   id,

@@ -4,7 +4,13 @@ import hash from 'object-hash'
 import { timeFormatDefaultLocale } from 'd3'
 import { POLYGON_CLIP_PATH } from 'common/constants'
 import { apiRoot, dateFormat, timeFormat } from 'config'
-import { AppState, Source, Event, EventPostValidation } from 'store/types'
+import {
+  AppState,
+  Source,
+  Event,
+  EventPostValidation,
+  CategoryAssociation
+} from 'store/types'
 
 dayjs.extend(customParseFormat)
 
@@ -230,11 +236,16 @@ export function removeFromColoringSet(coloringSet, filters) {
   return newColoringSets.filter(item => item.length !== 0)
 }
 
-export function getEventCategories(event, activeCategories) {
-  const eventCats = event.associations.filter(a => a.mode === 'CATEGORY')
+export function getEventCategories(event: Event, activeCategories: string[]) {
+  const eventCats = event.associations.filter(
+    (association): association is CategoryAssociation => {
+      return association.mode === 'CATEGORY'
+    }
+  )
 
-  return eventCats.reduce((acc, val) => {
+  return eventCats.reduce<string[]>((acc, val) => {
     const activeCatTitle = activeCategories.find(cat => cat === val.title)
+
     if (activeCatTitle) {
       acc.push(activeCatTitle)
     }

@@ -12,6 +12,7 @@ export type Dimensions = {
   marginBottom: number
   contentHeight: number
   width_controls: number
+  trackHeight: number
 }
 
 export type TimeRange = [Date, Date] | [Date] | []
@@ -78,9 +79,9 @@ export type Narrative = {
 
 export type AssociationsObject = {
   coloringSet: string[][]
-  filters: FilterAssociation[]
+  filters: string[]
   narrative: Narrative
-  categories: CategoryAssociation[]
+  categories: string[]
   views: Views
 }
 
@@ -91,6 +92,7 @@ export type Errors = {
 export type Flags = {
   isFetchingDomain: boolean
   isFetchingSources: boolean
+  isNotification: boolean
   isCover: boolean
   isCardstack: boolean
   isInfopopup: boolean
@@ -172,7 +174,7 @@ export type AppState = {
   toolbar: Toolbar
   loading: boolean
   map: Map
-  searchQuery?: string
+  searchQuery: string
   filters: Record<string, unknown[]>
   intro: string[]
   narrativeState: {
@@ -219,7 +221,7 @@ export type Event = {
   time_display: string
 
   narrative__stepStyles: unknown[]
-  shape: Shape | undefined
+  shape: string | undefined
   colour: string
 }
 
@@ -247,7 +249,7 @@ export type EventPostValidation = {
   time_display: string
 
   narrative__stepStyles: unknown[]
-  shape: Shape | undefined
+  shape: string
   colour: string
 }
 
@@ -279,6 +281,7 @@ export type DomainState = {
   shapes: unknown[]
   regions: unknown[]
   notifications: Notification[]
+  narratives: Narrative[]
 }
 
 export type Titles = {
@@ -344,10 +347,12 @@ export type FeaturesState = {
   USE_SITES: boolean
   USE_SOURCES: boolean
   USE_REGIONS: boolean
-  GRAPH_NONLOCATED: GraphNonLocated
+  USE_SEARCH: boolean
+  // GRAPH_NONLOCATED: false
   HIGHLIGHT_GROUPS: boolean
   USE_SHAPES: boolean
   CUSTOM_EVENT_FIELDS: unknown[]
+  // ZOOM_TO_TIMEFRAME_ON_TIMELINE_CLICK: boolean
 }
 
 export type StoreState = {

@@ -24,6 +24,7 @@ import Categories from 'components/time/Categories'
 import {
   CategoryAssociation,
   Dimensions,
+  Event,
   StoreState,
   TimeRange,
   ZoomLevel
@@ -41,21 +42,26 @@ type TimelineProps = ReturnType<typeof mapStateToProps> &
 type TimelineMethods = {
   onUpdateTimerange: (timerange: TimeRange) => void
   getCategoryColor: (category: string) => string
-  onSelect: ((step: number) => void) | ((event: Event) => void)
+  onSelect: (step: number | Event) => void
 }
 
 type TimelineState = {
   isFolded: boolean
   timerange: TimeRange
   dims: Dimensions
-  scaleX: ScaleTime<number, number, never> | null
-  scaleY: ((cat: CategoryAssociation) => number) | null
+  scaleX: ScaleTime<number, number, never>
+  scaleY: (cat: string) => number
   dragPos0: number | null
   transitionDuration: number
 }
 
+type GetYArgs = {
+  category: string
+  // project: string | null
+}
+
 class Timeline extends Component<TimelineProps, TimelineState> {
-  svgRef: RefObject<SVGElement>
+  svgRef: RefObject<SVGSVGElement>
 
   constructor(props: TimelineProps) {
     super(props)
@@ -138,17 +144,13 @@ class Timeline extends Component<TimelineProps, TimelineState> {
       ])
   }
 
-  makeScaleY(
-    categories: CategoryAssociation[],
-    trackHeight: number,
-    marginTop: number
-  ) {
-    const { features } = this.props
-    if (features.GRAPH_NONLOCATED && features.GRAPH_NONLOCATED.categories) {
-      categories = categories.filter(
-        cat => !features.GRAPH_NONLOCATED.categories.includes(cat.title)
-      )
-    }
+  makeScaleY(categories: string[], trackHeight: number, marginTop: number) {
+    // const { features } = this.props
+    // if (features.GRAPH_NONLOCATED && features.GRAPH_NONLOCATED.categories) {
+    //   categories = categories.filter(
+    //     cat => !features.GRAPH_NONLOCATED.categories.includes(cat.title)
+    //   )
+    // }
 
     const extraPadding = 0
 
@@ -161,7 +163,7 @@ class Timeline extends Component<TimelineProps, TimelineState> {
       return (i + 1) * catHeight + marginTop + extraPadding / 2
     })
 
-    return (cat: CategoryAssociation) => {
+    return (cat: string) => {
       const idx = categories.indexOf(cat)
       return catsYpos[idx]
     }
@@ -372,12 +374,12 @@ class Timeline extends Component<TimelineProps, TimelineState> {
   }
 
   getDatetimeX(datetime: Date) {
-    return this.state.scaleX?.(datetime)
+    return this.state.scaleX(datetime)
   }
 
-  getY(event) {
-    const { features, domain, activeCategories } = this.props
-    const { USE_CATEGORIES, GRAPH_NONLOCATED } = features
+  getY({ category }: GetYArgs) {
+    const { features, activeCategories } = this.props
+    const { USE_CATEGORIES } = features
 
     const categoriesExist =
       USE_CATEGORIES && activeCategories && activeCategories.length > 0
@@ -386,16 +388,14 @@ class Timeline extends Component<TimelineProps, TimelineState> {
       return this.state.dims.trackHeight / 1.5
     }
 
-    const { category } = event
+    // if (GRAPH_NONLOCATED && GRAPH_NONLOCATED.categories.includes(category)) {
+    //   return (
+    //     this.state.dims.marginTop +
+    //     domain.projects[project].offset +
+    //     this.props.ui.eventRadius
+    //   )
+    // }
 
-    if (GRAPH_NONLOCATED && GRAPH_NONLOCATED.categories.includes(category)) {
-      const { project } = event
-      return (
-        this.state.dims.marginTop +
-        domain.projects[project].offset +
-        this.props.ui.eventRadius
-      )
-    }
     if (!this.state.scaleY) {
       return 0
     }
@@ -412,20 +412,20 @@ class Timeline extends Component<TimelineProps, TimelineState> {
    * at the second index is an optional additional component that renders in
    * the <g/> div.
    */
-  styleDatetime(timestamp, category) {
+  styleDatetime(/*timestamp, category*/) {
     return [null, null]
   }
 
-  onSelect(event) {
-    if (this.props.features.ZOOM_TO_TIMEFRAME_ON_TIMELINE_CLICK) {
-      const timeframe = Math.floor(
-        this.props.features.ZOOM_TO_TIMEFRAME_ON_TIMELINE_CLICK / 2
-      )
-      const start = timeMinute.offset(event.datetime, -timeframe)
-      const end = timeMinute.offset(event.datetime, timeframe)
-      this.props.actions.updateTicks(1)
-      this.props.methods.onUpdateTimerange([start, end])
-    }
+  onSelect(event: Event) {
+    // if (this.props.features.ZOOM_TO_TIMEFRAME_ON_TIMELINE_CLICK) {
+    //   const timeframe = Math.floor(
+    //     this.props.features.ZOOM_TO_TIMEFRAME_ON_TIMELINE_CLICK / 2
+    //   )
+    //   const start = timeMinute.offset(event.datetime, -timeframe)
+    //   const end = timeMinute.offset(event.datetime, timeframe)
+    //   this.props.actions.updateTicks(1)
+    //   this.props.methods.onUpdateTimerange([start, end])
+    // }
     this.props.methods.onSelect(event)
   }
 
@@ -454,7 +454,7 @@ class Timeline extends Component<TimelineProps, TimelineState> {
         className={classes}
         style={extraStyle}
         onKeyDown={this.props.onKeyDown}
-        tabIndex="1"
+        tabIndex={1}
       >
         <Header
           title={title}
@@ -483,12 +483,12 @@ class Timeline extends Component<TimelineProps, TimelineState> {
               />
               <Categories
                 dims={dims}
-                getCategoryY={category =>
-                  this.getY({ category, project: null })
-                }
-                onDragStart={this.onDragStart}
-                onDrag={this.onDrag}
-                onDragEnd={this.onDragEnd}
+                getCategoryY={(category: string) => {
+                  return this.getY({ category })
+                }}
+                onDragStart={event => this.onDragStart(event)}
+                onDrag={event => this.onDrag(event)}
+                onDragEnd={event => this.onDragEnd(event)}
                 categories={categories}
                 features={this.props.features}
                 fallbackLabel={
@@ -508,17 +508,16 @@ class Timeline extends Component<TimelineProps, TimelineState> {
                 extent={this.getTimeScaleExtent()}
                 zoomLevels={this.props.app.timeline.zoomLevels}
                 dims={dims}
-                onApplyZoom={this.onApplyZoom}
+                onApplyZoom={zoom => this.onApplyZoom(zoom)}
               />
               <Markers
                 dims={dims}
                 selected={this.props.app.selected}
-                getEventX={ev => this.getDatetimeX(ev.datetime)}
-                getEventY={this.getY}
+                getEventX={(event: Event) => this.getDatetimeX(event.datetime)}
+                getEventY={(event: Event) => this.getY(event)}
                 categories={categories}
                 transitionDuration={this.state.transitionDuration}
                 styles={this.props.ui.styles}
-                features={this.props.features}
                 eventRadius={this.props.ui.eventRadius}
               />
               <Events
@@ -562,7 +561,7 @@ function mapStateToProps(state: StoreState) {
     domain: {
       events: selectors.selectStackedEvents(state),
       eventCountInTimeRange: selectors.selectEventCountInTimeRange(state),
-      projects: selectors.selectProjects(state),
+      projects: selectors.selectProjects(/*state*/),
       narratives: state.domain.narratives
     },
     app: {

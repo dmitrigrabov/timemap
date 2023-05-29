@@ -133,10 +133,10 @@ export const selectEvents = createSelector(
             .map(association => activeCategories.includes(association.title))
             .some(s => s)) ||
         activeCategories.length === 0
-      let isActiveTime = isTimeRangedIn(event, timeRange)
-      isActiveTime = features.GRAPH_NONLOCATED
-        ? (!event.latitude && !event.longitude) || isActiveTime
-        : isActiveTime
+      const isActiveTime = isTimeRangedIn(event, timeRange)
+      // isActiveTime = features.GRAPH_NONLOCATED
+      //   ? (!event.latitude && !event.longitude) || isActiveTime
+      //   : isActiveTime
       const isActiveShape = event.shape && activeShapes.includes(event.shape.id)
       if (event.type === SHAPE) {
         if (isActiveShape && isActiveCategory && isActiveTime) {
@@ -286,75 +286,84 @@ export const selectLocations = createSelector([selectEvents], events => {
 
 export const selectEventsWithProjects = createSelector(
   [selectEvents, getFeatures, getEventRadius],
-  (events, features, eventRadius) => {
-    if (!features.GRAPH_NONLOCATED) {
-      return [events, []]
-    }
-    const projSize = 2 * eventRadius
-    const projectIdx = features.GRAPH_NONLOCATED.projectIdx || 0
-    const getProject = ev => ev.filters[projectIdx]
-    const projects = {}
-
-    // get all projects
-    events = events.reduce((acc, event) => {
-      const project =
-        event.filters.length >= 1 && !event.latitude && !event.longitude
-          ? getProject(event)
-          : null
-
-      // add project if it doesn't exist
-      if (project !== null) {
-        if (projects.hasOwnProperty(project)) {
-          projects[project].start = dateMin(
-            projects[project].start,
-            event.datetime
-          )
-          projects[project].end = dateMax(projects[project].end, event.datetime)
-        } else {
-          projects[project] = {
-            start: event.datetime,
-            end: event.datetime,
-            key: project,
-            category: event.category
-          }
-        }
-      }
-      acc.push({ ...event, project })
-      return acc
-    }, [])
-
-    const projObjs = Object.values(projects)
-    projObjs.sort((a, b) => a.start - b.start)
-
-    // active projects is a data structure with projObjs.length empty slots
-    const activeProjs = Object.keys(projects).map((_, idx) => null)
-
-    const projectsWithOffset = projObjs.reduce((acc, proj, theIdx) => {
-      // remove any project that have ended from slots
-      activeProjs.forEach((theProj, theProjIdx) => {
-        if (theProj !== null) {
-          const projInSlot = projects[theProj]
-          if (projInSlot.end < proj.start) {
-            activeProjs[theProjIdx] = null
-          }
-        }
-      })
-      let i = 0
-      // find the first empty slot
-      while (activeProjs[i]) {
-        i++
-      }
-      // put proj in slot
-      activeProjs[i] = proj.key
-
-      proj.offset = i * projSize
-      acc[proj.key] = proj
-      return acc
-    }, {})
-
-    return [events, projectsWithOffset]
+  (events /*, features , eventRadius*/) => {
+    //if (!features.GRAPH_NONLOCATED) {
+    return [events, []]
+    // }
   }
 )
+
+// export const selectEventsWithProjects = createSelector(
+//   [selectEvents, getFeatures, getEventRadius],
+//   (events, features, eventRadius) => {
+//     if (!features.GRAPH_NONLOCATED) {
+//       return [events, []]
+//     }
+//     const projSize = 2 * eventRadius
+//     const projectIdx = features.GRAPH_NONLOCATED.projectIdx || 0
+//     const getProject = ev => ev.filters[projectIdx]
+//     const projects = {}
+
+//     // get all projects
+//     events = events.reduce((acc, event) => {
+//       const project =
+//         event.filters.length >= 1 && !event.latitude && !event.longitude
+//           ? getProject(event)
+//           : null
+
+//       // add project if it doesn't exist
+//       if (project !== null) {
+//         if (projects.hasOwnProperty(project)) {
+//           projects[project].start = dateMin(
+//             projects[project].start,
+//             event.datetime
+//           )
+//           projects[project].end = dateMax(projects[project].end, event.datetime)
+//         } else {
+//           projects[project] = {
+//             start: event.datetime,
+//             end: event.datetime,
+//             key: project,
+//             category: event.category
+//           }
+//         }
+//       }
+//       acc.push({ ...event, project })
+//       return acc
+//     }, [])
+
+//     const projObjs = Object.values(projects)
+//     projObjs.sort((a, b) => a.start - b.start)
+
+//     // active projects is a data structure with projObjs.length empty slots
+//     const activeProjs = Object.keys(projects).map((_, idx) => null)
+
+//     const projectsWithOffset = projObjs.reduce((acc, proj, theIdx) => {
+//       // remove any project that have ended from slots
+//       activeProjs.forEach((theProj, theProjIdx) => {
+//         if (theProj !== null) {
+//           const projInSlot = projects[theProj]
+//           if (projInSlot.end < proj.start) {
+//             activeProjs[theProjIdx] = null
+//           }
+//         }
+//       })
+//       let i = 0
+//       // find the first empty slot
+//       while (activeProjs[i]) {
+//         i++
+//       }
+//       // put proj in slot
+//       activeProjs[i] = proj.key
+
+//       proj.offset = i * projSize
+//       acc[proj.key] = proj
+//       return acc
+//     }, {})
+
+//     return [events, projectsWithOffset]
+//   }
+// )
 
 export const selectStackedEvents = createSelector(
   [selectEventsWithProjects],
@@ -363,15 +372,16 @@ export const selectStackedEvents = createSelector(
   }
 )
 
-export const selectProjects = createSelector(
-  [selectEventsWithProjects, getFeatures],
-  (eventsWithProjects, features) => {
-    if (!features.GRAPH_NONLOCATED) {
-      return []
-    }
-    return eventsWithProjects[1]
-  }
-)
+export const selectProjects = () => []
+// export const selectProjects = createSelector(
+//   [selectEventsWithProjects, getFeatures],
+//   (eventsWithProjects, features) => {
+//     if (!features.GRAPH_NONLOCATED) {
+//       return []
+//     }
+//     return eventsWithProjects[1]
+//   }
+// )
 
 /**
  * Of all the sources, select those that are relevant to the selected events.

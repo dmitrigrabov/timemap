@@ -1,20 +1,26 @@
 import { ChangeEvent, Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import * as actions from 'actions'
+import actions from 'actions'
 import SearchRow from 'components/controls/atoms/SearchRow'
-import { AppDispatch } from 'store'
 import { Event } from 'store/types'
 
-type SearchProps = {
+type SearchProps = ReturnType<typeof mapDispatchToProps> & {
   queryString: string
   events: Event[]
-  actions: typeof actions
 }
 
 type SearchState = {
   isFolded: boolean
 }
+
+type SearchAttribute = 'description' | 'location' | 'category' | 'date'
+const searchAttributes: SearchAttribute[] = [
+  'description',
+  'location',
+  'category',
+  'date'
+]
 
 class Search extends Component<SearchProps, SearchState> {
   constructor(props: SearchProps) {
@@ -41,17 +47,15 @@ class Search extends Component<SearchProps, SearchState> {
   render() {
     let searchResults
 
-    const searchAttributes = ['description', 'location', 'category', 'date']
-
     if (!this.props.queryString) {
       searchResults = []
     } else {
       searchResults = this.props.events.filter(event =>
-        searchAttributes.some(attribute =>
-          event[attribute]
-            .toLowerCase()
-            .includes(this.props.queryString.toLowerCase())
-        )
+        searchAttributes.some((attribute: SearchAttribute) => {
+          const value = event[attribute].toLowerCase()
+
+          return value.includes(this.props.queryString.toLowerCase())
+        })
       )
     }
 
@@ -99,7 +103,7 @@ class Search extends Component<SearchProps, SearchState> {
   }
 }
 
-function mapDispatchToProps(dispatch: AppDispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators(actions, dispatch)
   }

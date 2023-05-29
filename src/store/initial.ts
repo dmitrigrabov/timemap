@@ -197,7 +197,7 @@ const initial: StoreState = {
     USE_SITES: false,
     USE_SOURCES: false,
     USE_REGIONS: false,
-    GRAPH_NONLOCATED: false,
+    // GRAPH_NONLOCATED: false,
     HIGHLIGHT_GROUPS: false
   }
 }

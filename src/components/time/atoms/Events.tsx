@@ -3,7 +3,7 @@ import DatetimeSquare from 'components/time/atoms/DatetimeSquare'
 import DatetimeStar from 'components/time/atoms/DatetimeStar'
 import DatetimeTriangle from 'components/time/atoms/DatetimeTriangle'
 import DatetimePentagon from 'components/time/atoms/DatetimePentagon'
-import Project from 'components/time/atoms/Project'
+// import Project from 'components/time/atoms/Project'
 import ColoredMarkers from 'components/atoms/ColoredMarkers'
 import {
   calcOpacity,
@@ -150,9 +150,8 @@ const TimelineEvents = ({
         return null
       }
     }
-    const isDot =
-      (isLatitude(event.latitude) && isLongitude(event.longitude)) ||
-      (features.GRAPH_NONLOCATED && event.projectOffset !== -1)
+    const isDot = isLatitude(event.latitude) && isLongitude(event.longitude)
+    // || (features.GRAPH_NONLOCATED && event.projectOffset !== -1)
 
     const { shape: eventShape } = event
 
@@ -224,7 +223,7 @@ const TimelineEvents = ({
 
   return (
     <g clipPath="url(#clip)">
-      {features.GRAPH_NONLOCATED
+      {/* {features.GRAPH_NONLOCATED
         ? Object.values(projects).map(project => (
             <Project
               key={project.id}
@@ -236,7 +235,7 @@ const TimelineEvents = ({
               colour={getCategoryColor(project.category)}
             />
           ))
-        : null}
+        : null} */}
       {events.reduce(renderEvent, [])}
     </g>
   )

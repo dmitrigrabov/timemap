@@ -23,14 +23,11 @@ import { isMobileOnly } from 'react-device-detect'
 
 import { Component, KeyboardEvent } from 'react'
 import { DomainExternal, StoreState, Narrative, Event } from 'store/types'
-import { Actions, default as actionsObject } from 'actions'
+import actions from 'actions'
 import MapCarto from 'components/space/carto/Map'
-import { AppDispatch } from 'store'
 
-type DashboardProps = StoreState & {
-  actions: Actions
-  narrativeIdx: number
-}
+type DashboardProps = ReturnType<typeof mapStateToProps> &
+  ReturnType<typeof mapDispatchToProps>
 
 class Dashboard extends Component<DashboardProps> {
   constructor(props: DashboardProps) {
@@ -272,8 +269,6 @@ class Dashboard extends Component<DashboardProps> {
   }
 
   renderIntroPopup(isMobile, styles) {
-    const { app, actions } = this.props
-
     const extraContent = isMobile ? (
       <div style={{ position: 'relative', bottom: 0 }}>
         <h3 style={{ color: 'var(--error-red)' }}>
@@ -289,9 +284,9 @@ class Dashboard extends Component<DashboardProps> {
       <Popup
         title="Introduction to the platform"
         theme="dark"
-        isOpen={app.flags.isIntropopup}
-        onClose={actions.toggleIntroPopup}
-        content={app.intro}
+        isOpen={this.props.app.flags.isIntropopup}
+        onClose={this.props.actions.toggleIntroPopup}
+        content={this.props.app.intro}
         styles={styles}
         isMobile={isMobile}
       >
@@ -301,7 +296,7 @@ class Dashboard extends Component<DashboardProps> {
   }
 
   render() {
-    const { actions, app, domain, features } = this.props
+    const { app, domain, features } = this.props
     const dateHeight = 80
     const padding = 2
     const checkMobile = isMobileOnly || window.innerWidth < 600
@@ -356,12 +351,12 @@ class Dashboard extends Component<DashboardProps> {
         <Toolbar
           isNarrative={!!app.associations.narrative}
           methods={{
-            onTitle: actions.toggleCover,
+            onTitle: this.props.actions.toggleCover,
             onSelectFilter: filters =>
-              actions.toggleAssociations('filters', filters),
+              this.props.actions.toggleAssociations('filters', filters),
             onCategoryFilter: categories =>
-              actions.toggleAssociations('categories', categories),
-            onShapeFilter: actions.toggleShapes,
+              this.props.actions.toggleAssociations('categories', categories),
+            onShapeFilter: this.props.actions.toggleShapes,
             onSelectNarrative: (narrative: Narrative) => {
               this.setNarrative(narrative)
             }
@@ -386,7 +381,7 @@ class Dashboard extends Component<DashboardProps> {
             onSelect: app.associations.narrative
               ? this.selectNarrativeStep
               : ev => this.handleSelect(ev, 0),
-            onUpdateTimerange: actions.updateTimeRange,
+            onUpdateTimerange: this.props.actions.updateTimeRange,
             getCategoryColor: (category: string) =>
               this.getCategoryColor(category)
           }}
@@ -466,18 +461,19 @@ class Dashboard extends Component<DashboardProps> {
   }
 }
 
-function mapDispatchToProps(dispatch: AppDispatch) {
+function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(actionsObject, dispatch)
+    actions: bindActionCreators(actions, dispatch)
   }
 }
 
-export default connect(
-  (state: StoreState) => ({
+function mapStateToProps(state: StoreState) {
+  return {
     ...state,
     narrativeIdx: selectors.selectNarrativeIdx(state),
     narratives: selectors.selectNarratives(state),
     selected: selectors.selectSelected(state)
-  }),
-  mapDispatchToProps
-)(Dashboard)
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)
