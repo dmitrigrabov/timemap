@@ -36,8 +36,8 @@ import { AppDispatch } from 'store'
 
 type ToolbarMethods = {
   onTitle: () => ToggleCoverAction
-  onSelectFilter: (filters: Associations | Associations[]) => void
-  onCategoryFilter: (categories: Associations | Associations[]) => void
+  onSelectFilter: (filters: string | string[]) => void
+  onCategoryFilter: (categories: string | string[]) => void
   onSelectNarrative: (narrative: Narrative) => void
   onShapeFilter: (shape: string) => {
     type: string

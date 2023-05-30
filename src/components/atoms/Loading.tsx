@@ -1,7 +1,13 @@
-import React from 'react'
-import copy from '../../common/data/copy.json'
+import copy from 'common/data/copy.json'
+import { FC } from 'react'
+import { Language } from 'store/types'
 
-const LoadingOverlay = ({ isLoading, language }) => {
+type LoadingOverlayProps = {
+  isLoading: boolean
+  language: Language
+}
+
+const LoadingOverlay: FC<LoadingOverlayProps> = ({ isLoading, language }) => {
   let classes = 'loading-overlay'
   classes += !isLoading ? ' hidden' : ''
 

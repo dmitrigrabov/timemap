@@ -1,21 +1,39 @@
 import { isOdd } from 'common/utilities'
+import { FC } from 'react'
+import { CSSProperties } from 'styled-components'
 
-function createStar(numPoints, r, x, y) {
+function createStar(numPoints: number, r: number, x: number, y: number) {
   const innerRadius = r
   const outerRadius = (r * 2) / numPoints
   const angle = Math.PI / numPoints
-  const points = []
+  const points: string[] = []
 
   for (let i = 0; i < numPoints * 2; i++) {
     const radius = isOdd(i) ? innerRadius : outerRadius
-    points.push(radius * Math.sin(i * angle) + x)
-    points.push(radius * Math.cos(i * angle) + y)
+    const coords = `${radius * Math.sin(i * angle) + x},${
+      radius * Math.cos(i * angle) + y
+    }`
+    points.push(coords)
   }
 
-  return points
+  return points.join(' ')
 }
 
-const DatetimeStar = ({ x, y, r, onSelect, styleProps, extraRender }) => {
+type DatetimeStarProps = {
+  x: number
+  y: number
+  r: number
+  onSelect: () => void
+  styleProps: CSSProperties
+}
+
+const DatetimeStar: FC<DatetimeStarProps> = ({
+  x,
+  y,
+  r,
+  onSelect,
+  styleProps
+}) => {
   return (
     <polygon
       onClick={onSelect}

@@ -1,4 +1,4 @@
-import { bindActionCreators } from 'redux'
+import { Dispatch, bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as selectors from 'selectors'
 
@@ -22,9 +22,16 @@ import { binarySearch } from 'common/utilities'
 import { isMobileOnly } from 'react-device-detect'
 
 import { Component, KeyboardEvent } from 'react'
-import { DomainExternal, StoreState, Narrative, Event } from 'store/types'
+import {
+  DomainExternal,
+  StoreState,
+  Narrative,
+  Event,
+  Source
+} from 'store/types'
 import actions from 'actions'
 import MapCarto from 'components/space/carto/Map'
+import { CSSProperties } from 'styled-components'
 
 type DashboardProps = ReturnType<typeof mapStateToProps> &
   ReturnType<typeof mapDispatchToProps>
@@ -34,7 +41,7 @@ class Dashboard extends Component<DashboardProps> {
     super(props)
 
     this.handleViewSource = this.handleViewSource.bind(this)
-    this.handleHighlight = this.handleHighlight.bind(this)
+    // this.handleHighlight = this.handleHighlight.bind(this)
     this.setNarrative = this.setNarrative.bind(this)
     // this.setNarrativeFromFilters = this.setNarrativeFromFilters.bind(this)
     this.handleSelect = this.handleSelect.bind(this)
@@ -65,18 +72,18 @@ class Dashboard extends Component<DashboardProps> {
     globalThis.window.dispatchEvent(new Event('resize'))
   }
 
-  handleHighlight(highlighted) {
-    this.props.actions.updateHighlighted(highlighted || null)
-  }
+  // handleHighlight(highlighted) {
+  //   this.props.actions.updateHighlighted(highlighted || null)
+  // }
 
-  handleViewSource(source) {
+  handleViewSource(source: Source) {
     this.props.actions.updateSource(source)
   }
 
-  findEventIdx(theEvent) {
+  findEventIdx(theEvent: Event) {
     const { events } = this.props.domain
     return binarySearch(events, theEvent, (theev, otherev) => {
-      return theev.datetime - otherev.datetime
+      return theev.datetime.getTime() - otherev.datetime.getTime()
     })
   }
 
@@ -132,9 +139,13 @@ class Dashboard extends Component<DashboardProps> {
     this.props.actions.updateSelected(matchedEvents)
   }
 
-  getCategoryColor(category: string) {
+  getCategoryColor(category?: string) {
     if (!this.props.features.USE_CATEGORIES) {
       return fallbackEventColor
+    }
+
+    if (!category) {
+      return this.props.ui.style.categories.default
     }
 
     const cat: string | undefined = this.props.ui.style.categories[category]
@@ -301,7 +312,7 @@ class Dashboard extends Component<DashboardProps> {
     const padding = 2
     const checkMobile = isMobileOnly || window.innerWidth < 600
 
-    const popupStyles = {
+    const popupStyles: CSSProperties = {
       height: checkMobile ? '100vh' : 'fit-content',
       display: checkMobile ? 'block' : 'table',
       width: checkMobile
@@ -408,7 +419,8 @@ class Dashboard extends Component<DashboardProps> {
           methods={{
             onNext: () => this.selectNarrativeStep(this.props.narrativeIdx + 1),
             onPrev: () => this.selectNarrativeStep(this.props.narrativeIdx - 1),
-            onSelectNarrative: this.setNarrative
+            onSelectNarrative: (narrative: Narrative) =>
+              this.setNarrative(narrative)
           }}
         />
         <InfoPopup
@@ -430,20 +442,19 @@ class Dashboard extends Component<DashboardProps> {
             narrative={app.narrative}
             queryString={app.searchQuery}
             events={domain.events}
-            onSearchRowClick={this.handleSelect}
+            onSearchRowClick={events => this.handleSelect(events)}
           />
         )}
         {app.source ? (
           <MediaOverlay
             source={app.source}
             onCancel={() => {
-              actions.updateSource(null)
+              actions.updateSource(undefined)
             }}
           />
         ) : null}
         <LoadingOverlay
           isLoading={app.loading || app.flags.isFetchingDomain}
-          ui={app.flags.isFetchingDomain}
           language={app.language}
         />
         {features.USE_COVER && (
@@ -461,7 +472,7 @@ class Dashboard extends Component<DashboardProps> {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
   return {
     actions: bindActionCreators(actions, dispatch)
   }

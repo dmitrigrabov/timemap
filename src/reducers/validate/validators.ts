@@ -203,11 +203,10 @@ export function validateDomain(
         const relatedShapeObj = shapesTemp2?.find(
           shape => shape.id === event.shape
         )
+        // errorMsg =
+        //   'Failed to find related shape. Please verify shape type for event.'
 
-        if (!relatedShapeObj) {
-          // errorMsg =
-          //   'Failed to find related shape. Please verify shape type for event.'
-        } else {
+        if (relatedShapeObj) {
           eventShape = relatedShapeObj
         }
       }

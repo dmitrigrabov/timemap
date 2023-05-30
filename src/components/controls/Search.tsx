@@ -1,13 +1,15 @@
 import { ChangeEvent, Component } from 'react'
-import { bindActionCreators } from 'redux'
+import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import actions from 'actions'
 import SearchRow from 'components/controls/atoms/SearchRow'
-import { Event } from 'store/types'
+import { Event, Narrative } from 'store/types'
 
 type SearchProps = ReturnType<typeof mapDispatchToProps> & {
   queryString: string
   events: Event[]
+  narrative: Narrative
+  onSearchRowClick: (events: Event[]) => void
 }
 
 type SearchState = {
@@ -45,19 +47,15 @@ class Search extends Component<SearchProps, SearchState> {
   }
 
   render() {
-    let searchResults
+    const searchResults = !this.props.queryString
+      ? this.props.events.filter(event => {
+          return searchAttributes.some((attribute: SearchAttribute) => {
+            const value = event[attribute].toLowerCase()
 
-    if (!this.props.queryString) {
-      searchResults = []
-    } else {
-      searchResults = this.props.events.filter(event =>
-        searchAttributes.some((attribute: SearchAttribute) => {
-          const value = event[attribute].toLowerCase()
-
-          return value.includes(this.props.queryString.toLowerCase())
+            return value.includes(this.props.queryString.toLowerCase())
+          })
         })
-      )
-    }
+      : []
 
     return (
       <div
@@ -66,7 +64,10 @@ class Search extends Component<SearchProps, SearchState> {
           (this.props.narrative ? ' narrative-mode ' : '')
         }
       >
-        <div id="search-bar-icon-container" onClick={this.onButtonClick}>
+        <div
+          id="search-bar-icon-container"
+          onClick={() => this.onButtonClick()}
+        >
           <i className="material-icons">search</i>
         </div>
         <div
@@ -77,22 +78,23 @@ class Search extends Component<SearchProps, SearchState> {
           <div className="search-input-container">
             <input
               className="search-bar-input"
-              onChange={this.updateSearchQuery}
+              onChange={event => this.updateSearchQuery(event)}
               type="text"
             />
             <i
               id="close-search-overlay"
               className="material-icons"
-              onClick={this.onButtonClick}
+              onClick={() => this.onButtonClick()}
             >
               close
             </i>
           </div>
           <div className="search-results">
-            {searchResults.map(result => (
+            {searchResults.map(event => (
               <SearchRow
-                onSearchRowClick={this.props.onSearchRowClick}
-                eventObj={result}
+                key={event.id}
+                onSearchRowClick={events => this.props.onSearchRowClick(events)}
+                event={event}
                 query={this.props.queryString}
               />
             ))}
@@ -103,7 +105,7 @@ class Search extends Component<SearchProps, SearchState> {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch: Dispatch) {
   return {
     actions: bindActionCreators(actions, dispatch)
   }

@@ -524,7 +524,9 @@ export const dateMax = function () {
 /** Taken from
  * https://stackoverflow.com/questions/22697936/binary-search-in-javascript
  * **/
-export function binarySearch(ar, el, compareFn) {
+type CompareFn<T> = (a: T, b: T) => number
+
+export const binarySearch = <T>(ar: T[], el: T, compareFn: CompareFn<T>) => {
   let m = 0
   let n = ar.length - 1
   while (m <= n) {

@@ -1,8 +1,13 @@
-import React from 'react'
+import { FC } from 'react'
 import { connect } from 'react-redux'
-import { selectActiveNarrative } from '../../../selectors'
+import { selectActiveNarrative } from 'selectors'
+import { Narrative, StoreState } from 'store/types'
 
-function NarrativeCard({ narrative }) {
+type NarrativeCardProps = {
+  narrative: Narrative
+}
+
+const NarrativeCard: FC<NarrativeCardProps> = ({ narrative }) => {
   // no display if no narrative
   const { steps, current } = narrative
 
@@ -32,7 +37,7 @@ function NarrativeCard({ narrative }) {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: StoreState) {
   return {
     narrative: selectActiveNarrative(state)
   }

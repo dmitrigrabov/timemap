@@ -207,7 +207,9 @@ const fetchDomain = (): ThunkAction<
         dispatch(fetchError('Failed to fetch'))
         dispatch(toggleFetchingDomain())
 
-        alert(err.message)
+        console.log(err)
+
+        // alert(err.message)
 
         return undefined
       })
@@ -379,10 +381,10 @@ const updateNarrativeStepIdx = (idx: number): UpdateNarrativeStepIdxAction => ({
 
 export type UpdateSourceAction = {
   type: 'UPDATE_SOURCE'
-  source: Source
+  source: Source | undefined
 }
 
-const updateSource = (source: Source): UpdateSourceAction => ({
+const updateSource = (source: Source | undefined): UpdateSourceAction => ({
   type: 'UPDATE_SOURCE',
   source
 })

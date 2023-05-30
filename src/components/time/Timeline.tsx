@@ -40,7 +40,7 @@ type TimelineProps = ReturnType<typeof mapStateToProps> &
 
 type TimelineMethods = {
   onUpdateTimerange: (timerange: TimeRange) => void
-  getCategoryColor: (category: string) => string
+  getCategoryColor: (category: string | undefined) => string
   onSelect: (step: number | Event) => void
 }
 
@@ -487,7 +487,7 @@ class Timeline extends Component<TimelineProps, TimelineState> {
                 }}
                 onDragStart={event => this.onDragStart(event)}
                 onDrag={event => this.onDrag(event)}
-                onDragEnd={event => this.onDragEnd(event)}
+                onDragEnd={() => this.onDragEnd()}
                 categories={categories}
                 features={this.props.features}
                 fallbackLabel={
@@ -533,9 +533,11 @@ class Timeline extends Component<TimelineProps, TimelineState> {
                 //   }
                 //   return categories.map(c => c.group === group)
                 // }}
-                getCategoryColor={this.props.methods.getCategoryColor}
+                getCategoryColor={category => {
+                  return this.props.methods.getCategoryColor(category)
+                }}
                 transitionDuration={this.state.transitionDuration}
-                onSelect={this.onSelect}
+                onSelect={event => this.onSelect(event)}
                 dims={dims}
                 features={this.props.features}
                 setLoading={this.props.actions.setLoading}
