@@ -19,7 +19,7 @@ import Timeline from "./time/Timeline";
 import Space from "./space/Space";
 import Search from "./controls/Search";
 import CardStack from "./controls/CardStack";
-import NarrativeControls from "./controls/NarrativeControls.js";
+import NarrativeControls from "./controls/NarrativeControls";
 
 import colors from "../common/global";
 import { binarySearch, insetSourceFrom } from "../common/utilities";
@@ -42,12 +42,13 @@ class Dashboard extends React.Component {
 
   componentDidMount() {
     if (!this.props.app.isMobile) {
-      this.props.actions.fetchDomain().then((domain) =>
-        this.props.actions.updateDomain({
+      this.props.actions.fetchDomain().then((domain) => {
+        console.log('FETCHED DOMAIN', domain)
+        return this.props.actions.updateDomain({
           domain,
           features: this.props.features,
         })
-      );
+    });
     }
     // NOTE: hack to get the timeline to always show. Not entirely sure why
     // this is necessary.

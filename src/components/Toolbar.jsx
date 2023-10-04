@@ -23,6 +23,7 @@ import {
 } from "../common/utilities.js";
 import { ToolbarButton } from "./controls/atoms/ToolbarButton";
 import { FullscreenToggle } from "./controls/FullScreenToggle";
+import { config } from "../config"
 
 class Toolbar extends React.Component {
   constructor(props) {
@@ -253,7 +254,7 @@ class Toolbar extends React.Component {
     const { features, narratives, toolbarCopy } = this.props;
     const narrativesExist = narratives && narratives.length !== 0;
     let title = copy[this.props.language].toolbar.title;
-    if (process.env.display_title) title = process.env.display_title;
+    if (config.display_title) title = config.display_title;
     const { panels } = toolbarCopy;
 
     const narrativesIdx = 0;

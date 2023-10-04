@@ -4,6 +4,9 @@ import { UPDATE_DOMAIN, MARK_NOTIFICATIONS_READ } from "../actions";
 import { validateDomain } from "./validate/validators.js";
 
 function updateDomain(domainState, action) {
+  const { domain } = action.payload;
+  console.log({ domain, domainState })
+  
   return {
     ...domainState,
     ...validateDomain(action.payload.domain, action.payload.features),

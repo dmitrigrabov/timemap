@@ -1,4 +1,4 @@
-module.exports = {
+export const config = {
   title: 'IPHR',
   display_title: 'IPHR',
   SERVER_ROOT: 'https://data-helper-server.herokuapp.com',

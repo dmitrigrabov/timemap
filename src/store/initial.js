@@ -1,9 +1,9 @@
 import { mergeDeepLeft } from 'ramda'
-
 import global, { colors } from '../common/global'
 import copy from '../common/data/copy.json'
 import { language } from '../common/utilities'
 import { DEFAULT_TAB_ICONS } from '../common/constants'
+import {config} from '../config'
 
 const isSmallLaptop = window.innerHeight < 800
 const mapIniital = {
@@ -202,8 +202,8 @@ const initial = {
 }
 
 let appStore
-if (process.env.store) {
-  appStore = mergeDeepLeft(process.env.store, initial)
+if (config.store) {
+  appStore = mergeDeepLeft(config.store, initial)
 } else {
   appStore = initial
 }

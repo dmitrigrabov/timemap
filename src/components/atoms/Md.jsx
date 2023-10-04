@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { marked } from "marked";
 
 class Md extends React.Component {
@@ -39,10 +38,10 @@ class Md extends React.Component {
   }
 }
 
-Md.propTypes = {
-  loader: PropTypes.func,
-  unloader: PropTypes.func.isRequired,
-  path: PropTypes.string.isRequired,
-};
+// Md.propTypes = {
+//   loader: PropTypes.func,
+//   unloader: PropTypes.func.isRequired,
+//   path: PropTypes.string.isRequired,
+// };
 
 export default Md;

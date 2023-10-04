@@ -25,7 +25,6 @@ const Media = ({ media }) => {
       ? `${title.slice(0, TITLE_LENGTH + 1)}...`
       : title
 
-  debugger
   switch (type) {
     case 'Video':
       return (
@@ -74,7 +73,7 @@ const Media = ({ media }) => {
           <TwitterTweetEmbed tweetId={tweetId} />
         </div>
       )
-      debugger
+
       return t
 
     case 'Manual':

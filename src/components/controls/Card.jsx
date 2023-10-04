@@ -61,7 +61,7 @@ export const generateCardLayout = {
         ])
       )
     ]
-    debugger
+
     return formatted
   }
 }
@@ -84,7 +84,7 @@ export const Card = ({
 
   // TODO: render afterCaret appropriately from props
   sources = []
-  debugger
+
   return (
     <li
       key={hash(content)}

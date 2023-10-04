@@ -2,16 +2,17 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
 import hash from "object-hash";
 import { timeFormatDefaultLocale } from "d3";
-
+import { config } from '../config'
 import { ASSOCIATION_MODES, POLYGON_CLIP_PATH } from "./constants";
+import esMx from "./data/es-MX.json"
 
 dayjs.extend(customParseFormat);
 
-let { DATE_FMT, TIME_FMT } = process.env;
+let { DATE_FMT, TIME_FMT } = config
 if (!DATE_FMT) DATE_FMT = "MM/DD/YYYY";
 if (!TIME_FMT) TIME_FMT = "HH:mm";
 
-export const language = process.env.store.app.language || "en-US";
+export const language = config.store.app.language || "en-US";
 
 export function getPathLeaf(path) {
   const splitPath = path.split("/");
@@ -171,7 +172,7 @@ export function getImmediateFilterParent(filter) {
  */
 export function getFilterSiblings(allFilters, filterParent, filterKey) {
   function findSiblings(filterPathObj, ancestors) {
-    if (ancestors.length === 0 || filterPathObj === {}) return {};
+    if (ancestors.length === 0 /*|| filterPathObj === {}*/) return {};
     const nextAncestor = ancestors.shift();
     if (Object.keys(filterPathObj).includes(nextAncestor)) {
       const nextObjToSearch = filterPathObj[nextAncestor];
@@ -269,12 +270,12 @@ export function injectSource(id) {
 }
 
 export function urlFromEnv(ext) {
-  if (process.env[ext]) {
-    if (!Array.isArray(process.env[ext])) {
-      return [`${process.env.SERVER_ROOT}${process.env[ext]}`];
+  if (config[ext]) {
+    if (!Array.isArray(config[ext])) {
+      return [`${config.SERVER_ROOT}${config[ext]}`];
     } else {
-      return process.env[ext].map(
-        (suffix) => `${process.env.SERVER_ROOT}${suffix}`
+      return config[ext].map(
+        (suffix) => `${config.SERVER_ROOT}${suffix}`
       );
     }
   } else {
@@ -506,7 +507,7 @@ export function makeNiceDate(datetime) {
  */
 export function setD3Locale() {
   const languages = {
-    "es-MX": require("./data/es-MX.json"),
+    "es-MX": esMx,
   };
 
   if (language !== "es-US" && languages[language]) {
